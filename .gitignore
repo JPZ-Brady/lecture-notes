@@ -1,0 +1,33 @@
+# private lecture material, never commit
+录音/
+音频/
+录音稿/
+笔记/
+复习台/
+课件/
+课程表.json
+课程.json
+勘误表.json
+不加入学习台.json
+交接文档.md
+_test-timetable.js
+# browser profile with login state
+_shot/
+_screenshot.js
+# caches, logs, backups, models, local config
+.tmp/
+.graphflow-cache/
+graphflow-out/
+日志/
+_备份/
+模型/
+config.json
+*.bak*
+*.m4a
+*.wav
+*.mp3
+*.onnx
+*.bin
+.env
+__pycache__/
+node_modules/

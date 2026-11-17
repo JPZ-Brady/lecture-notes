@@ -1,0 +1,4 @@
+{
+  "model": "D:\\path\\to\\whisper\\models\\ggml-large-v3-turbo-q8_0.bin",
+  "diarize": false
+}

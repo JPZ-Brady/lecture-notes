@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>课堂笔记系统 · 使用说明</title>
+<style>
+:root{--sans:system-ui,-apple-system,"Segoe UI","Noto Sans SC","Microsoft YaHei",sans-serif;
+  --mono:ui-monospace,"Cascadia Mono",Consolas,monospace;--r:16px;--ease:cubic-bezier(.16,1,.3,1)}
+body[data-theme="paper"]{color-scheme:light;--bg:#f1f2f4;--surface:#ffffff;--ink:#191a1c;--ink-soft:#45484d;--ink-mute:#5f6369;--line:#e0e3e7;--line-soft:#eceff2;--accent:#a63d2f;--accent-ink:#8a2f23;--wash:#f3e8e4;--wash2:#eedcd6;--glow1:rgba(166,61,47,.12);--glow2:rgba(120,130,150,.14)}
+body[data-theme="forest"]{color-scheme:light;--bg:#f1f5f0;--surface:#fbfdf9;--ink:#16211a;--ink-soft:#3f4f45;--ink-mute:#6b7a70;--line:#d9e3da;--line-soft:#e8efe9;--accent:#2f6b4b;--accent-ink:#24543a;--wash:#e6f0ea;--wash2:#dbeae1;--glow1:rgba(47,107,75,.14);--glow2:rgba(130,190,140,.13)}
+body[data-theme="cobalt"]{color-scheme:light;--bg:#f3f6fb;--surface:#fff;--ink:#131a24;--ink-soft:#414c5c;--ink-mute:#6b7788;--line:#dde4ee;--line-soft:#eaeff7;--accent:#2f5bd0;--accent-ink:#2648a8;--wash:#e8eefc;--wash2:#dde7fa;--glow1:rgba(47,91,208,.13);--glow2:rgba(90,160,220,.13)}
+body[data-theme="dusk"]{color-scheme:dark;--bg:#121319;--surface:#191b23;--ink:#e9e8ef;--ink-soft:#bcbbc7;--ink-mute:#8e8d9b;--line:#2b2e39;--line-soft:#23252f;--accent:#e0a458;--accent-ink:#f0bd7d;--wash:#221f26;--wash2:#2a262f;--glow1:rgba(224,164,88,.14);--glow2:rgba(120,110,200,.14)}
+body[data-theme="jade"]{color-scheme:dark;--bg:#0f1513;--surface:#161d1a;--ink:#e5efea;--ink-soft:#b3c4bc;--ink-mute:#86968e;--line:#26302c;--line-soft:#1e2724;--accent:#4fd1a5;--accent-ink:#7ce0bc;--wash:#1b2622;--wash2:#213029;--glow1:rgba(79,209,165,.14);--glow2:rgba(60,140,150,.13)}
+body[data-theme="aurora"]{color-scheme:dark;--bg:#0f0c17;--surface:#171327;--ink:#ece9f7;--ink-soft:#bdb6d6;--ink-mute:#8f88a8;--line:#292243;--line-soft:#201a34;--accent:#b28dff;--accent-ink:#c9b0ff;--wash:#1e1834;--wash2:#251d40;--glow1:rgba(178,141,255,.16);--glow2:rgba(90,200,250,.12)}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15.5px;line-height:1.72;-webkit-font-smoothing:antialiased}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:6px}
+.hero{background:radial-gradient(110% 130% at 8% -10%,var(--glow1) 0,transparent 58%),radial-gradient(90% 110% at 92% 0,var(--glow2) 0,transparent 62%),var(--bg);border-bottom:1px solid var(--line)}
+.wrap{max-width:900px;margin:0 auto;padding:0 24px}
+.hero-in{padding:56px 0 30px}
+h1{font-size:clamp(26px,3.4vw,38px);letter-spacing:-.024em;line-height:1.14;margin:0;font-weight:680}
+.lead{margin:16px 0 0;font-size:17.5px;color:var(--ink-soft);max-width:56ch}
+.bar{display:flex;gap:7px;align-items:center;margin:24px 0 0;flex-wrap:wrap}
+.sw{width:22px;height:22px;padding:0;border-radius:50%;border:1px solid var(--line);cursor:pointer;position:relative}
+.sw[aria-pressed="true"]{outline:2px solid var(--accent);outline-offset:2px}
+.sw i{position:absolute;inset:4px;border-radius:50%}
+main{padding:0 0 90px}
+section{padding-top:34px;margin-top:36px;border-top:1px solid var(--line-soft)}
+section:first-of-type{border-top:0;margin-top:30px;padding-top:10px}
+h2{font-size:23px;letter-spacing:-.016em;margin:0 0 18px;font-weight:660}
+h2::after{content:"";display:block;width:34px;height:2px;background:var(--accent);margin-top:9px;border-radius:2px}
+h3{font-size:17.5px;margin:26px 0 8px;font-weight:640}
+p{margin:0 0 14px;max-width:70ch}
+ol,ul{padding-left:22px;max-width:70ch}
+li{margin:7px 0}
+li::marker{color:var(--accent)}
+code{font-family:var(--mono);font-size:13px;background:var(--wash);padding:2px 6px;border-radius:6px;color:var(--accent-ink)}
+pre{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 18px;overflow:auto;
+  font-family:var(--mono);font-size:13px;line-height:1.7;margin:14px 0;max-width:100%}
+table{width:100%;border-collapse:collapse;font-size:14.5px;margin:14px 0}
+th{text-align:left;font-weight:620;font-size:13px;color:var(--ink-mute);padding:0 14px 10px 0;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:11px 14px 11px 0;border-bottom:1px solid var(--line-soft);vertical-align:top}
+tbody tr:nth-child(2n){background:color-mix(in srgb,var(--wash) 45%,transparent)}
+td:first-child{font-weight:560;white-space:nowrap}
+.flow{display:grid;gap:10px;margin:18px 0}
+@media (min-width:760px){.flow{grid-template-columns:repeat(4,1fr)}}
+.node{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px;position:relative}
+.node b{display:block;font-size:14.5px;margin-bottom:4px}
+.node span{font-size:13px;color:var(--ink-mute)}
+.node::after{content:"→";position:absolute;right:-13px;top:50%;transform:translateY(-50%);color:var(--accent);font-weight:700}
+@media (min-width:760px){.node:last-child::after{display:none}}
+@media (max-width:759px){.node::after{content:"↓";right:auto;left:50%;top:auto;bottom:-15px;transform:translateX(-50%)}}
+.note{border:1px solid var(--line);border-radius:12px;padding:14px 18px;background:color-mix(in srgb,var(--wash) 55%,transparent);margin:18px 0}
+.note b{color:var(--accent-ink)}
+.pill{display:inline-block;font-size:12.5px;color:var(--accent-ink);background:var(--wash2);border-radius:999px;padding:2px 10px;margin-right:6px}
+/* 结构示意图：一整张图（外框 + 内部分隔线），不是卡片堆叠 */
+.fig{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--surface);margin:20px 0}
+.fig .fr{padding:10px 15px;font-size:13px;color:var(--ink-soft);border-bottom:1px solid var(--line-soft)}
+.fig .fr b{color:var(--accent-ink);font-weight:620}
+.fig .cols{display:grid}
+@media (min-width:760px){.fig .cols{grid-template-columns:212px minmax(0,1fr) 200px}}
+.fig .col{padding:13px 15px;border-bottom:1px solid var(--line-soft)}
+@media (min-width:760px){.fig .col{border-bottom:0;border-right:1px solid var(--line-soft)}.fig .col:last-child{border-right:0}}
+.fig .tag{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.09em;color:var(--ink-mute);margin:0 0 8px}
+.fig .col p{margin:0 0 7px;font-size:13px;color:var(--ink-soft)}
+.fig .col p:last-child{margin-bottom:0}
+.fig ol{margin:0;padding-left:19px;font-size:13px;color:var(--ink-soft);max-width:none}
+.fig ol li{margin:3px 0}
+.fig .figcap{font-size:12.5px;color:var(--ink-mute);padding:10px 15px;background:color-mix(in srgb,var(--wash) 40%,transparent)}
+footer{max-width:900px;margin:0 auto;padding:22px 24px 60px;border-top:1px solid var(--line-soft);color:var(--ink-mute);font-size:12.5px}
+@media print{body{--bg:#fff;--surface:#fff;--ink:#000;--ink-soft:#333;--ink-mute:#555;--line:#ccc;--line-soft:#e4e4e4;--wash:#f4f4f4;--wash2:#eee;--accent:#000;--accent-ink:#000}.hero{background:#fff}.bar{display:none}}
+</style>
+</head>
+<body data-theme="paper">
+<header class="hero"><div class="wrap hero-in">
+  <h1>课堂笔记系统 · 使用说明</h1>
+  <p class="lead">一台笔记本 + 一部手机，把英文课堂变成「可复习的中文笔记 + 自动排期的记忆卡」。笔记是一份<b>三栏工作台</b>网页：左边切视图、中间看内容、右边查工具。全部数据都在自己电脑上（仅「转写稿 → 结构化笔记」这一步会调用 DeepSeek）。</p>
+  <div class="bar">
+    <button class="sw" type="button" data-theme="paper"  aria-label="纸墨"><i style="background:#a63d2f"></i></button>
+    <button class="sw" type="button" data-theme="forest" aria-label="松林"><i style="background:#2f6b4b"></i></button>
+    <button class="sw" type="button" data-theme="cobalt" aria-label="深海"><i style="background:#2f5bd0"></i></button>
+    <button class="sw" type="button" data-theme="dusk"   aria-label="夜航"><i style="background:#e0a458"></i></button>
+    <button class="sw" type="button" data-theme="jade"   aria-label="墨玉"><i style="background:#4fd1a5"></i></button>
+    <button class="sw" type="button" data-theme="aurora" aria-label="紫夜"><i style="background:#b28dff"></i></button>
+  </div>
+</div></header>
+
+<main class="wrap">
+
+<section>
+  <h2>它由四块拼成</h2>
+  <div class="flow">
+    <div class="node"><b>① 本土转写引擎</b><span>whisper.cpp + large-v3-turbo<br>跑在你显卡上，离线免费</span></div>
+    <div class="node"><b>② 笔记生产</b><span>make-notes.js<br>DeepSeek 加工成中文笔记</span></div>
+    <div class="node"><b>③ 笔记成品</b><span>单文件 HTML 三栏工作台<br>8 个视图、6 套主题、可打印</span></div>
+    <div class="node"><b>④ 复习调度</b><span>notes-cards.js → 学习台<br>FSRS-6 自动排期</span></div>
+  </div>
+  <table>
+    <thead><tr><th>位置</th><th>是什么</th></tr></thead>
+    <tbody>
+      <tr><td><项目文件夹>\</td><td>主工作区（脚本、启动器、模板都在这里）</td></tr>
+      <tr><td>…\课堂笔记\录音\</td><td><b>音频投递口</b>：把课后录音放这里。<b>用课程命名的子文件夹</b>（如 <code>录音\DEMO1006M\</code>）会连同课名一起被识别</td></tr>
+      <tr><td>…\课堂笔记\录音\已处理\&lt;课程&gt;\&lt;日期&gt;\</td><td>处理完的<b>原始录音</b>自动移到这里，收件箱保持干净（想找回来就在这里）</td></tr>
+      <tr><td>…\课堂笔记\笔记\&lt;课程&gt;\&lt;日期&gt;\</td><td><b>笔记成品</b>：<code>&lt;课程&gt;_&lt;日期&gt;.html</code>（主产物）+ <code>.md</code>（纯文本备份）+ <code>.json</code>（数据）。<b>一节课一个日期文件夹</b>；备份在上一层的 <code>_备份\</code> 里</td></tr>
+      <tr><td>…\课堂笔记\录音稿\&lt;课程&gt;\&lt;日期&gt;\</td><td><b>转写稿</b> <code>.txt</code> / <code>.srt</code>（开了发言人分离还会有 <code>.讲者.txt</code>）。可手工改错字，再用「生成笔记.cmd」重跑</td></tr>
+      <tr><td>…\课堂笔记\音频\&lt;课程&gt;\&lt;日期&gt;\</td><td><b>回听副本</b> <code>.m4a</code>：笔记里点 <code>[mm:ss]</code> 跳的就是这份，<b>别删</b></td></tr>
+      <tr><td>…\课堂笔记\复习台\&lt;年&gt;-W&lt;周&gt;.html</td><td>周复习台产物（双击即开）</td></tr>
+      <tr><td>…\课堂笔记\课程表.json</td><td><b>你的课表</b>：模块清单 + 固定课时 + 教学窗口，是自动认课的权威依据</td></tr>
+      <tr><td>…\课堂笔记\课程.json</td><td>自动记住的「音频文件名 → 课程名」对照；<b>认错了就改这里</b></td></tr>
+      <tr><td>…\课堂笔记\课件\&lt;课程名&gt;\</td><td><b>放老师的幻灯片</b>（PDF / PPTX / DOCX）——每门课一个文件夹，和笔记/录音稿的归法一致。放进去之后，这门课的笔记会自动多一个「课件核对」视图；同目录还会生成 <code>课程地图.md</code>（整学期讲什么）。<b>新课件不用自己搬</b>：丢进 <code>录音\</code> 双击 <code>整理课件.cmd</code>，它自己认课归位</td></tr>
+      <tr><td>…\课堂笔记\课件\_待归档\</td><td>认不出属于哪门课的课件先落这里（<b>绝不乱放</b>）。把文件名补上模块代码或课程名，再双击一次 <code>整理课件.cmd</code> 就会归位</td></tr>
+      <tr><td>…\课堂笔记\shell.html</td><td>笔记的视觉模板（调外观不用改代码；改完要重渲真实笔记）</td></tr>
+      <tr><td>…\课堂笔记\config.json</td><td>默认转写模型 + 发言人分离开关</td></tr>
+      <tr><td>…\课堂笔记\日志\</td><td>每次运行留一份日志，出问题先看最新的那个</td></tr>
+      <tr><td>…\课堂笔记\使用说明.html</td><td>就是这份说明（<b>v4 · 工作台版</b>）</td></tr>
+      <tr><td>…\课堂笔记\交接文档.md</td><td>（没有随仓库公开）写给下一个接手者（人或 AI）的技术交接：目录职责、环境坑、验收清单</td></tr>
+      <tr><td>D:\path\to\whisper\</td><td>转写引擎、模型、ffmpeg</td></tr>
+      <tr><td>…\whisper\terms-manual.txt</td><td><b>你的课程术语表</b>（每行一个，越加越准）</td></tr>
+      <tr><td>…\whisper\prompt.txt</td><td>由历史笔记 + 术语表汇总出的转写提示（<code>--build-prompt</code> 重建）</td></tr>
+      <tr><td>…\English Learning\学习台.html</td><td>FSRS-6 复习台（原词库 + 自动并入的课堂卡）</td></tr>
+      <tr><td>…\English Learning\notes-cards.js</td><td>管线每次写入的复习卡分片，学习台读它</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <h2>日常就三步</h2>
+  <h3>1 · 上课：听 + 录音</h3>
+  <ul>
+    <li><b>坐前 1/3，手机放桌上、麦克风朝讲者</b>：这一步对准确率的影响比任何软件设置都大（实测：远场录音信噪比只有 8.7 dB，近场能到 25 dB 以上）。</li>
+    <li>iPhone 用「语音备忘录」录音即可；<b>关掉任何“人声增强/降噪”开关</b>（会削掉弱音节，反而更难转写）。</li>
+    <li>实时理解可用手机同声传译 App 兜底，但别一直低头看屏幕，听课仍以听为主。</li>
+  </ul>
+
+  <h3>2 · 课后：双击一次，全套产出</h3>
+  <pre>把录音从手机传到电脑（微信文件传输助手 / iCloud）
+   → 丢进  <项目文件夹>\录音\
+        · 攒了几天的可以一起丢：一键流程会把「所有待处理音频」逐个跑完并汇总
+        · 想更保险，就丢进以课程命名的子文件夹（录音\DEMO1006M\）——文件夹名会当作课名，
+          且命中模块时会自动对齐成课表里的规范名
+   → 双击  一键出笔记.cmd
+   → 等 3~4 分钟／每个文件（一小时课；两小时连堂约 8 分钟）
+   → 浏览器自动弹出笔记 HTML</pre>
+  <p>这一下会自动完成：转码 → 本地转写 → <b>自动定课程名</b>（规则见下节）→ DeepSeek 生成笔记 → 同步复习卡到学习台；结束后音频自动移进 <code>录音\已处理\</code>，回听副本进 <code>音频\</code>。</p>
+  <p><b>四份产物都按「课程」分文件夹</b>，同一门课的笔记、转写稿、回听副本、原始录音各在一处，打开就是这个样子：</p>
+  <pre>笔记\DEMO1013M Communication for EPS\DEMO1013M_Communication_for_EPS_2026-09-22.html
+录音稿\DEMO1013M Communication for EPS\DEMO1013M_Communication_for_EPS_2026-09-22.txt
+音频\DEMO1013M Communication for EPS\DEMO1013M_Communication_for_EPS_2026-09-22.m4a
+录音\已处理\DEMO1013M Communication for EPS\DEMO1013M_Communication_for_EPS_2026-09-22.wav</pre>
+  <p>实测（同一台机器、同一套参数）：<b>26.5 分钟的真实课堂录音，转写只需 47~59 秒</b>（≈ 27~34× 实时）；<b>105.3 分钟的双节连堂（中间含 10 分钟课间）分段转写全程 7 分 20 秒</b>——whisper 纯转写 184.5 秒（≈ 34× 实时），其余是逐段体检、滤镜与切段；其中课间那一段自动试满 6 档、清掉 19 处循环碎片后按原样保留，好段各只跑一次。DeepSeek 生成笔记占 40~90 秒。所以一小时课整链约 3~4 分钟，两小时连堂约 8 分钟。</p>
+  <h3>它会怎样归档（全自动）</h3>
+  <p class="note"><b>2026-09-29 起：一节课一个日期文件夹。</b>同一天的四处产物永远在<b>同一个日期文件夹</b>里（文件夹名＝上课日期，拿不到才用生成日期），四个目录结构一致：<br>
+  <code>笔记\&lt;课程&gt;\2026-09-29\…html|.md|.json</code>　·　<code>录音稿\&lt;课程&gt;\2026-09-29\…txt|.srt</code>　·　<code>音频\&lt;课程&gt;\2026-09-29\…m4a</code>　·　<code>录音\已处理\&lt;课程&gt;\2026-09-29\…m4a|wav</code><br>
+  备份统一收在 <code>笔记\&lt;课程&gt;\_备份\</code>（不再散在课程根目录）；课件则是<b>每份各进一个自己的文件夹</b>：<b>整学期总课件放 <code>课件\&lt;课程&gt;\总课件\</code></b>（与日期文件夹并排），<b>单节课件按日期进 <code>课件\&lt;课程&gt;\&lt;日期&gt;\</code></b>（文件名里的日期 → <b>课件到货时间 + 课表进度</b>：按「这门课已做到哪一节、<b>下一个还没有课件的讲座日</b>就是它」推断，<b>文件名里的周号只在和到货时间对得上（≤4 天）时才采信</b>，对不上会打一行 ⚠ 并按进度归位 → 这门课最近一份笔记的上课日期 → 都没有才进 <code>无日期\</code>）。课程根目录只留<b>课程级</b>成果（共享课程地图 + 近似课程对比）。</p>
+  <ul>
+    <li><b>转写稿</b>→ <code>录音稿\&lt;课程&gt;\&lt;上课日期&gt;\&lt;课程&gt;_&lt;日期&gt;.txt</code>（先落盘。就算后面生成笔记失败，转写也不用重做）</li>
+    <li><b>笔记</b>→ <code>笔记\&lt;课程&gt;\&lt;上课日期&gt;\&lt;课程&gt;_&lt;日期&gt;.html</code>（+.md 备份 +.json 数据；<b>笔记重跑会落回同一个日期文件夹、同名覆盖</b>）</li>
+    <li><b>回听副本</b>→ <code>音频\&lt;课程&gt;\&lt;上课日期&gt;\&lt;课程&gt;_&lt;日期&gt;.m4a</code>（笔记里点 [mm:ss] 就跳到这里）。<b>录音是 WAV 时会自动转成压缩 m4a</b>（实测 145 MB → 19 MB），笔记照常带播放器</li>
+    <li><b>原音频</b>→ 自动移进 <code>录音\已处理\&lt;课程&gt;\&lt;上课日期&gt;\</code>（<b>放在子文件夹里的也一样会被归档</b>），收件箱保持干净</li>
+    <li><b>复习卡</b>→ 每次自动写入 <code>English Learning\notes-cards.js</code>（学习台按 F5 就能看到）。<b>想挑卡</b>：生成完会自动弹出<b>选卡页</b>（也可随时双击 <code>选卡.cmd</code>），取消勾选的卡会写进 <code>不加入学习台.json</code>，之后每次重建都不会再冒出来。选卡页<b>底部还有「排除清单体检」</b>：排除清单的 key 里嵌着原文，<b>笔记一旦重新生成、说法变了，那条排除就会失效、卡片会悄悄回到词库</b>（同步时会报「清单已失效 N 条」）—— 那一块逐条列出失效项、按相似度给出候选，可以<b>一键接回或删掉</b>，也能对生效中的排除点「放回」</li>
+    <li><b>课件核对</b>→ 若 <code>课件\&lt;课程名&gt;\</code> 里有这门课的幻灯片，会额外做一次「录音 × 课件」对账：<b>术语/数字/公式以课件为准</b>，并把「课件里有、笔记没覆盖」的要点也列出来（实测抓出过讲者口头补充的「停机问题」和参考书的精确章节）</li>
+    <li><b>转写质检</b>→ 转写完自动扫一遍时间轴：同一句重复 ≥3 次、&gt;8 秒空白、英文稿混入中文都会提示；<b>确凿的幻觉段会被直接剔除，不送进模型</b>（内置质量闸门只看重复次数，抓不到「静音处编话」，这一步补的就是它）</li>
+    <li><b>长录音分段</b>→ 超过 20 分钟的录音会先切成约 10 分钟一段、<b>逐段判定质量</b>：好的段一次就过（不再是整条反复重试），坏段先清掉循环重复的碎片、确实没人声的那段（例如课间休息）整段丢弃，最后把各段拼回一份完整转写稿，时间轴自动接上</li>
+  </ul>
+
+  <h3>3 · 复习：两处地方</h3>
+  <ul>
+    <li><b>当天</b>：打开笔记 HTML，左栏切到「复习问答」自测（点一下题面或按空格显示答案、←→ 翻题），再扫一遍「核心要点」。</li>
+    <li><b>长期</b>：打开 <code>English Learning\学习台.html</code>，分类里选「课堂笔记 · 课程名」或「课堂笔记问答 · 课程名」，让 FSRS-6 按遗忘曲线排期。</li>
+  </ul>
+</section>
+
+<section>
+  <h2>笔记页面长什么样：三栏工作台</h2>
+  <p>笔记不是一份从上滚到底的长文档，而是一个<b>带视图台的工作台</b>：左栏选看哪个视图，中栏只显示那一个视图，右栏是随课生成的查询工具。</p>
+
+  <div class="fig" role="img" aria-label="笔记页面结构示意：顶栏、三栏正文、底部状态栏">
+    <div class="fr"><b>顶栏（吸顶）</b>　标题（带朗读按钮）· 一句话概括 · 播放器 · 打印·PDF · 六套主题圆点</div>
+    <div class="cols">
+      <div class="col">
+        <span class="tag">左栏 · 本课视图</span>
+        <ol>
+          <li>核心要点</li>
+          <li>结构化笔记</li>
+          <li>中英对照</li>
+          <li>术语表</li>
+          <li>思维导图</li>
+          <li>复习问答</li>
+          <li>待办</li>
+          <li>课件核对</li>
+        </ol>
+        <p style="margin-top:8px">每项右边带<b>条目数</b>；下面还有「同门课其它讲次」和本课元信息（日期、时长、发言人数…）。</p>
+      </div>
+      <div class="col">
+        <span class="tag">中栏 · 内容</span>
+        <p><b>当前视图的标题</b>（左栏点哪个就在这显示哪个）；<b>已去掉原来的面包屑</b>——左栏本来就高亮着当前视图，重复。</p>
+        <p>一次只显示<b>一个</b>视图——点左栏就换，页面不会滑很长。窄屏（&lt;1020px）自动退回「全部展开」的文档流。</p>
+      </div>
+      <div class="col">
+        <span class="tag">右栏 · 学习工具</span>
+        
+        
+        <p><b>术语快查</b>：输入英文或中文即时筛选（现在右栏只留这一个工具）</p>
+      </div>
+    </div>
+    <div class="fr"><b>底部状态栏</b>　课程名 · 日期　｜　空格显示答案 · ←→ 翻题 · 点 [mm:ss] 回听 · 点左栏切换视图　｜　要点 7 · 术语 26 · 问答 12 · 时间点 31</div>
+    <div class="figcap">结构示意图（不是截图）：真实页面就是这三栏，配色跟着所选主题走。<br>
+      底部状态栏是一条<b>不透明</b>的页脚，上沿带 22px 渐隐——正文滚到它下面会「溶进」背景，不会被切成半行、也不会透出文字（宽屏才吸底；窄屏自动退回成页面末尾的普通一行）。</div>
+  </div>
+
+  <h3>八个视图各能做什么</h3>
+  <table>
+    <thead><tr><th>视图</th><th>能力</th></tr></thead>
+    <tbody>
+      <tr><td>核心要点</td><td>双栏 + 大号序号，每条带 <code>[mm:ss]</code>，30 秒扫完一节课</td></tr>
+      <tr><td>结构化笔记</td><td><b>笔记的产出主体</b>：按讲者的知识脉络分节（定义 → 原理 → 例子 → 易错点），长度不设上限；公式由离线渲染器把 LaTeX 转成 Unicode 与上下标（不引外部库）；识别存疑处标「存疑」</td></tr>
+      <tr><td>中英对照</td><td>课堂原句 + 中文翻译，宽屏左右对照，每条可点读</td></tr>
+      <tr><td>术语表</td><td>三线表：术语 / 中文 / 解释；标题旁有「连读本节」</td></tr>
+      <tr><td>思维导图</td><td>可折叠树、分层底色；点方框展开收起，整块复制可粘进 XMind</td></tr>
+      <tr><td>复习问答</td><td>问答卡：空格显示答案、←→ 翻题，带题目计数</td></tr>
+      <tr><td>待办</td><td>真实复选框，勾选状态存在本机浏览器，带完成进度</td></tr>
+      <tr><td>课件核对</td><td><b>拿老师的幻灯片给笔记对账，并把对不上的地方直接改对</b>：逐项列出「笔记/录音里的说法」vs「课件里的说法」，并标结论——<b>一致</b> / <b>以课件为准</b>（笔记与课件有出入）/ <b>课件未提及</b>（幻灯片上没有，可能是讲者口头补充）。<br><b>2026-09-30 起：标「以课件为准」的行会回改正文</b>——核对那次调用顺便给出「原文片段 → 课件写法」的定向补丁，本地只对<b>能唯一定位</b>的片段做机械替换（找不到或有歧义就不动，并在表格备注里写明原因），每次回改都打印出来。<b>左侧那一列永远保留录音原话</b>，所以改了什么、原来是什么一目了然。想只要报告不改正文：加 <code>--no-handout-patch</code>。最后还会列出「课件里有、笔记没覆盖到的要点」。<br>把该课程的幻灯片放进 <code>课件\&lt;课程名&gt;\</code> 就会自动做；<b>没有课件时这个视图不出现</b>。<br><b>2026-10-09 起</b>：这节课<b>没有新课件</b>时（老师接着讲上一节没讲完的那份）会自动<b>沿用最近一次</b>日期文件夹里那份来核对，并在视图上方写一行「<b>⚠ 课件来源：…</b>」——免得你以为核对用的就是这节课的课件。老师若已发新课件，先双击 <code>整理课件.cmd</code> 再重跑本笔记就会换成新的</td></tr>
+      <tr><td>朗读（全局）</td><td>标题、每条英文原句、每个术语旁都有喇叭按钮（内联 SVG，不是 emoji），点一下按<b>英式发音</b>读出来，再点停止</td></tr>
+      <tr><td>时间戳回听</td><td>要点/对照/问答里的 <code>[mm:ss]</code>，点了就把内嵌播放器跳到原话位置——每条内容都能回查核对</td></tr>
+    </tbody>
+  </table>
+  <div class="note"><b>左栏只列出「这次真有内容」的视图</b>：某次课没生成待办，左栏就没有「待办」这一项，不是坏了。<br>
+  <b>直达某一节</b>：地址栏加 <code>#terms</code>（或 <code>#qa</code>、<code>#mindmap</code>…）可以直接打开对应视图，也能把链接存成书签。<br>
+  <b>日期口径</b>：左栏写「<b>上课日期</b>」时，那是从文件名或你给的 <code>--date</code> 得来的可靠日期，笔记文件名也用它；都没有时写「生成日期」（手机转码 m4a 里的时间标签实测是转码时刻，不作数）。<br>
+  <b>看不到新版式？</b>按 <code>Ctrl+F5</code> 强制刷新。管线每次打开都会带一个版本号（<code>?v=时间戳</code>）绕开缓存，手工打开旧标签页时才会遇到。</div>
+</section>
+
+<section>
+  <h2>命令速查</h2>
+  <p>所有命令都在 <code><项目文件夹></code> 目录下执行（或不带参数的纯双击）。</p>
+  <table>
+    <thead><tr><th>命令</th><th>作用</th></tr></thead>
+    <tbody>
+      <tr><td>一键出笔记.cmd</td><td><b>日常就用这个</b>：取 <code>录音\</code> 里<b>所有待处理音频</b>逐个跑完整流程（= <code>node make-notes.js --all</code>），处理完把音频移进 <code>录音\已处理\</code>，最后汇总成功/失败个数</td></tr>
+      <tr><td>生成笔记.cmd</td><td>只重跑「笔记生成」：取 <code>录音稿\</code> 里最新的 .txt，用最新转写稿重新生成（<b>不重新转写</b>，文件名不变）</td></tr>
+      <tr><td>node make-notes.js</td><td>只处理<b>最新的一个</b>音频（不扫全收件箱）</td></tr>
+      <tr><td>node make-notes.js --stats "某.m4a"</td><td><b>只体检不转写</b>：看电平/信噪比/静音占比，判断这间教室收音好不好</td></tr>
+      <tr><td>node make-notes.js --audio "某.m4a" --only</td><td>只转写，不生成笔记</td></tr>
+      <tr><td>node make-notes.js --file "录音稿\x.txt" --course "课名"</td><td>指定转写稿 + 指定课程名（决定文件名与卡片分类）</td></tr>
+      <tr><td>node make-notes.js --audio "某.m4a" --date "2026-09-25 13:05"</td><td>文件名没有时间信息时，手动告诉它这节课的时间。<b>给了就会按课表定时段并据此定名</b>；只给日期也行（<code>--date "2026-09-25"</code>），此时只补日期、不猜时刻、也不对课表</td></tr>
+      <tr><td>node make-notes.js --build-prompt</td><td>重建术语提示（从历史笔记 + <code>terms-manual.txt</code> 汇总成 <code>whisper\prompt.txt</code>）</td></tr>
+      <tr><td>node make-notes.js --check</td><td>测 DeepSeek key 与网络通不通</td></tr>
+      <tr><td>node make-notes.js --where</td><td>显示它到底从哪个文件读到了 key</td></tr>
+      <tr><td>node make-notes.js --mock --no-sync</td><td><b>离线自测</b>：用样例数据渲染一份笔记，不联网、不花钱（改模板时用它迭代）</td></tr>
+      <tr><td>node sync-fsrs.js</td><td>单独重新同步复习卡（一键流程里已自动执行）</td></tr>
+      <tr><td>周复习.cmd</td><td>把本周所有笔记汇总成一页「周复习台」（课程卡片 + 知识地图 + 术语汇总 + 跨课抽查 15 题 + 待办）</td></tr>
+      <tr><td>选卡.cmd</td><td><b>挑卡</b>：打开选卡页，逐张勾选哪些课堂卡进英语学习台（默认全勾）。取消勾选的会写进 <code>不加入学习台.json</code>，<b>以后每次重建都尊重它</b>。一键出笔记流程结束后会自动打开一次</td></tr>
+      <tr><td>node weekly-review.js --list</td><td>看看哪几周有笔记</td></tr>
+      <tr><td>一键出笔记.cmd --model "…\ggml-large-v3-turbo-q5_0.bin"</td><td>只这一次换模型（更省显存；详见下方「换模型」）</td></tr>
+      <tr><td>node make-notes.js --audio "某.m4a" --diarize</td><td>额外做发言人分离（输出「讲者稿」；弱录音会提示覆盖率不可靠）</td></tr>
+      <tr><td>操作手册.md / 操作手册.html</td><td><b>一页版操作手册</b>：只讲「怎么用」——每个功能什么时候用、双击哪个文件、产物在哪、出错怎么自查。想查全部细节还是看这份说明</td></tr>
+      <tr><td>查近似课程.cmd</td><td><b>近似课程 / 提前学去哪找</b>：读你这门课的课程地图，用<b>课件自己的关键词</b>生成一批现成的搜索入口（Bing/Google/GitHub/中国大学MOOC/学堂在线/NPTEL/MIT OCW…）和一张<b>待填对照表</b>，浏览器直接打开。<b>它不下结论</b>——「哪门课像」是事实判断，必须有能点开的来源，结论写进同目录的 <code>近似课程对比.md</code></td></tr>
+      <tr><td>整理课件.cmd</td><td><b>课件归位</b>：把新课件（丢在 <code>录音\</code> 里，或直接放在 <code>课件\_待归档\</code>）自动认课、放进 <code>课件\&lt;课程名&gt;\</code>、并就地生成课程地图。认课靠「模块代码 → 模块缩写（如 KRR）→ 课程名关键词」三层机械证据，<b>认不出就进 <code>_待归档\</code>，绝不乱放</b>；搬运是「先复制 → 逐字节比对 → 才删原件」，同名不同内容绝不覆盖</td></tr>
+      <tr><td>node _verify-output.js</td><td><b>笔记产物体检（41 项）</b>：结构 + 设计底线 + 工作台骨架 + 播放器不变量 + 课件核对视图（含「回改正文只改唯一匹配」的 5 个用例）+ 勘误表（正文不残留听错词）+ <b>内嵌数据副本与同名 .json 一致</b>（不一致会指出差在哪个字段）+ <b>目录布局</b>（笔记在 <code>&lt;课程&gt;/&lt;日期&gt;/</code>、播放器指向的音频真的存在、同一天四处产物在同一日期文件夹、周复习台链接可达）+ 防止「固定视口外壳」「吸底条压字」回归（可加路径参数指定某一份，默认挑最新的）</td></tr>
+      <tr><td>node _test-timetable.js</td><td><b>课表机制自测（79 项）</b>：时间解析、学期判定、真实课表匹配、跨学期不串、教学窗口；跑完自动还原你的真课表</td></tr>
+      <tr><td>node _verify-slides.js</td><td><b>课件管线自测（应全绿；项数随课程数增加）</b>：课程地图结构（讲号连续、页范围不重叠、与课件目录交叉核对）、目录里有多份课件时选哪份、<b>课件放进日期子文件夹后仍能被找到并配对</b>、认课三层证据 + 「线索不够就不认」、搬运安全（不覆盖、不误删）、可双击的 HTML 视图。离线，不动你的文件</td></tr>
+      <tr><td>node _test-chunk.js</td><td><b>长音频分段转写自测（14 项）</b>：srt 时间戳进位、突发重复怎么判（循环幻觉丢掉、隔几十秒的真重复保留）、srt 合并的时间轴平移与连续编号、真实切段（150 秒按 60 秒切 3 段、总时长不丢）、幻觉区间怎么切（只丢课间那一小段，保住前后的真课堂）、质量打分阈值自洽。<b>不跑 whisper、不花 GPU/API</b>，几秒跑完</td></tr>
+      <tr><td>node _verify-launchers.js</td><td>全部 .cmd 启动器自检（是否纯 ASCII + CRLF、引用的脚本是否存在），现有 6 个</td></tr>
+      <tr><td>勘误表.json + node fix-errata.js</td><td><b>听错词纠正</b>：whisper 偶尔会把说过的词听错（实测把 <code>KRR</code> 写成了 <code>AR-10s</code>）。往 <code>勘误表.json</code> 里加一条 <code>{"from":"听错的样子","to":"正确写法"}</code>，再跑 <code>node fix-errata.js</code> 就会把<b>已有产物</b>一起改过来（<b>零 API、幂等</b>）；以后的新录音在转写落盘那一刻自动应用。规则是纯机械替换、每次都打印改了哪些词；笔记里「课件核对」那条抓错记录会有意保留原样（<code>handout.*</code> 整块豁免 —— 那是证据，改了反而自相矛盾），HTML 里那份内嵌数据副本也一样不动。加 <code>--dry</code> 只报告不落盘。<br>万一副本真的不一致了（体检会报「内嵌 JSON 与 .json 文件一致」不通过并指出字段），跑 <code>node fix-embedded-json.js</code> 按同名 <code>.json</code> 重建（先备份；零 API）</td></tr>
+      <tr><td>node md-view.js "课件\&lt;课程名&gt;"</td><td>把课件目录里的 <code>.md</code> 全部转成<b>双击就能看的单文件 HTML</b>（离线自包含、带搜索框和打印按钮、浅色深色可切）。<code>课程地图.html</code> 每次跑课件流程会自动生成，不用手动敲</td></tr>
+      <tr><td>python slides-extract.py "课件\&lt;课程名&gt;"</td><td>把课件（PDF/PPTX/DOCX）提成文本 + 每页标题清单（<b>机械提取，模型不参与</b>）</td></tr>
+      <tr><td>node import-slides.js</td><td>课件归位 + 建图一条龙（= 双击 <code>整理课件.cmd</code>）。加 <code>--dry</code> 只报告不动文件，加路径可只处理指定的一份</td></tr>
+      <tr><td>node read-slides.js "课件\&lt;课程名&gt;"</td><td>生成<b>课程地图</b>：全课目录 + 每讲页码范围 + 幻灯片标题骨架（讲边界取自幻灯片扉页，与课件自带目录交叉核对）。<br><b>一门课有多份课件时</b>（整学期总课件 + 老师每周发的单节课件）：每份课件都各自有一份 <code>课程地图-&lt;课件名&gt;.*</code>；共享的 <code>课程地图.*</code> 永远归<b>页数最多</b>的那份（＝整学期总课件），所以后加的单节课件<b>不会顶掉它</b>。用 <code>--deck 关键词</code> 指定某份，<code>--primary</code> 才会强制改共享地图。<br>加 <code>--intro</code> 多花 1 次调用，让模型给每讲写 1-2 句中文导语（会明确标注是模型生成的；以后不带 <code>--intro</code> 重跑会沿用、不丢）。<br><b>单节课件也认</b>：老师只发了一节课的课件、里面没有「Lecture N」扉页时，会自动按「<b>整份＝一讲</b>」处理（页范围 p1–pN），笔记照样能做「课件核对」</td></tr>
+      <tr><td>node make-notes.js … --pages 3-30</td><td>手动指定用课件的哪几页做核对（不给就自动判讲；判错时用这个兜住）</td></tr>
+      <tr><td>node make-notes.js … --deck KRR</td><td>该课程目录里有好几份课件时，指定本次互校用哪一份。<b>不指定时的挑法</b>：先找你上课那天日期的那份 → 这节课没有新课件就<b>沿用最近一次</b>日期文件夹里那份（笔记里会写明来源）→ 有整学期总课件就用它 → 都没有才按页数挑最大的</td></tr>
+      <tr><td>node make-notes.js … --no-handout</td><td>这次不做课件核对</td></tr>
+      <tr><td>node _verify-transcript.js</td><td><b>转写稿质检（时间轴口径）</b>：同一句重复 ≥3 次 / &gt;8 秒空白 / 英文稿混入中文——专门抓内置闸门漏掉的「静音处编话」。不带参数就体检 <code>录音稿\</code> 下全部 .srt</td></tr>
+      <tr><td>node trim-transcript.js</td><td><b>剪掉转写稿里的某一段</b>（课间、休息、投影仪噪音那种没人讲课的时段）：<code>--from 54:18 --to 1:02:57</code> 给窗口，<b>默认只预演</b>，加 <code>--yes</code> 才真改（写前自动备份到 <code>_备份\</code>）。srt 段重新编号、时间戳不动（[mm:ss] 回听点仍然对得上）；<code>.txt</code> 按句子同步删。可加 <code>--course "课程名" --date 2026-10-13</code> 指定，或 <code>--file</code> 直接指某个 .srt。剪完想更新笔记：双击 <code>生成笔记.cmd</code></td></tr>
+      <tr><td>node rematch-excluded.js</td><td><b>排除清单失效体检</b>：同步时报「清单已失效 N 条」时用它。<b>不带参数只分析</b>（列出失效项 + 同课程候选项）；<code>--apply 2:1</code> 把第 2 条接到第 1 候选、<code>--apply-high</code> 只接高置信（重叠 ≥0.70）；<code>--drop-qa 1,3</code> / <code>--drop-terms 2</code> 直接删掉「卡片已经不在词库」的那种死条目。改完自动重跑同步；清单也可以直接在选卡页底部点着改</td></tr>
+      <tr><td>node _verify-guide.js</td><td>这份使用说明自身的体检（标签平衡 / 离线自包含 / 六主题 / 关键数字 / 旧描述复活）</td></tr>
+      <tr><td>node _test-bridge.js</td><td>学习台接入体检（在 English Learning 目录运行）</td></tr>
+    </tbody>
+  </table>
+  <div class="note"><b>可选开关</b>：<span class="pill">--all</span>处理收件箱全部音频　<span class="pill">--no-sync</span>不同步复习卡　<span class="pill">--vad / --no-vad</span>静音检测（默认关，实测弱录音下会裁掉真语音）　<span class="pill">--lang en</span>指定语言　<span class="pill">--force</span>稿子很短也强行生成笔记　<span class="pill">--quiet</span>不转发转写过程输出　<span class="pill">--no-audio-copy</span>不把音频拷进 音频\　<span class="pill">--no-archive</span>不把音频移进 录音\已处理\　<span class="pill">--date "2026-09-28 10:00"</span>指定录音时间　<span class="pill">--diarize / --no-diarize</span>发言人分离　<span class="pill">--keep-context</span>保留上文（默认关闭以防循环幻觉）　<span class="pill">--no-normalize</span>关闭音频归一化　<span class="pill">--model &lt;路径&gt;</span>指定转写模型　<span class="pill">--no-chunk</span>长录音不分段（退回旧行为）　<span class="pill">--chunk-sec 600</span>改每段秒数</div>
+</section>
+
+<section>
+  <h2>课程名怎么来的（不用你起名）</h2>
+  <p>笔记文件名与复习卡分类都靠「课程名」组织。系统按下面的顺序自动决定，<b>前面命中就不看后面</b>：</p>
+  <table>
+    <thead><tr><th>顺序</th><th>来源</th><th>怎么用</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td><code>--course "课名"</code></td><td>显式指定，永远最优先</td></tr>
+      <tr><td>2</td><td><b>课程表按时段匹配（唯一）</b></td><td>时间来源<b>可靠</b>时（文件名自带日期时间，或你用 <code>--date</code> 指定），按星期 + 时间 + 教学窗口对到课表课时——最客观，唯一命中就直接用</td></tr>
+      <tr><td>3</td><td><code>课程.json</code> 记住的名字</td><td>上次用的名字（含你手工订正过的）——同一文件名第二次处理自动沿用</td></tr>
+      <tr><td>4</td><td>录音所在子文件夹名</td><td>如 <code>录音\DEMO1006M\</code>；命中模块会自动对齐成规范课名。<b>注意：课表时段（第 2 档）优先级更高</b>，所以「10月」「未整理」这类组织用文件夹不会污染课名</td></tr>
+      <tr><td>5</td><td><b>AI 按内容从课表认课</b></td><td>没有时间线索时，课程表随转写稿一起交给模型，命中就返回「代码 + 名称」——与生成笔记是同一次请求，<b>不额外花钱</b></td></tr>
+      <tr><td>6</td><td>AI 自起名 / 音频文件名</td><td>都不匹配（讲座、说明会、活动）时兜底；「未指定」这类占位词会被拒绝，改用下一档</td></tr>
+    </tbody>
+  </table>
+  <h3>你的课表已经填好了（2026-09-22 从两份 PDF 提取）</h3>
+  <p><code>课堂笔记\课程表.json</code> 里是 <b>13 门模块 + 29 个固定课时</b>（其中 10 个标了 <code>noName</code>），分成两张表：</p>
+  <ul>
+    <li><code>modules</code>：全部模块（代码 + 课名 + 学期）。给 AI 按内容认课用，<b>这是最有用的一张表</b>。</li>
+    <li><code>slots</code>：有固定时间的课（星期 + 起止 + 周次 + 教室）。给「按录音时间定时段」用。答疑（DROP-IN）和联合实验课标了 <code>noName</code>，<b>只当时间线索，不抢着给笔记起名</b>。</li>
+  </ul>
+  <h3>第一学期课名也已补全（2026-09-22 01:30 版 PDF）</h3>
+  <p>13 门模块现在全部带课名，笔记会直接命名为 <code>DEMO1006M Knowledge Repres. &amp; Reasoning_2026-09-29.html</code> 这种，一眼就能对上你的课表：</p>
+  <ul>
+    <li>第一学期：DEMO1006M Knowledge Repres. &amp; Reasoning · DEMO1009M Programming for Data Science · DEMO1001M Data Science · DEMO1011M Adv Software Engineering · DEMO1012M Scientific Computation · DEMO1013M Communication for EPS</li>
+    <li>第二学期：DEMO1005M Bio-Inspired Computing · DEMO1010M Data Mining &amp; Text Analysis · DEMO1007M Machine Learning · DEMO1008M Deep Learning · DEMO1002M Cloud Computing Systems · DEMO1003M Blockchain Technologies · DEMO1004M MSc Project</li>
+  </ul>
+  <h3>迎新周场次也已入表（第 0 周）</h3>
+  <p>迎新周那几场不属于 13 门模块，但已作为「场次」写进 <code>slots</code>（周次 0），所以它们也能被正确命名，而不是被 AI 硬套成某个模块：</p>
+  <ul>
+    <li>周一 12:00 欢迎加入计算机学院 · 周一 15:00 <b>Language Centre 学术英语（某位老师）</b> · 周四 10:00 LINUX 入门 · 周五 13:00 What Happens Next</li>
+    <li>实测：那份 <code>University of Leeds 2.txt</code>（某位老师 的学术英语辅导）原先被 AI 认成模块课 <code>DEMO1013M Communication for EPS</code>；补入场次并加上「非教学场次不要硬套模块代码」的判定规则后，已正确输出 <code>迎新周 · Language Centre 学术英语（某位老师）</code>。</li>
+    <li>周五 9:00–18:00 的「导师见面」是全天窗口，为避免它吞掉整个周五的匹配，<b>没有</b>写进表里。</li>
+  </ul>
+  <h3>时间怎么自动定时段</h3>
+  <ul>
+    <li>录音文件名带日期时间（如 <code>录音_20260929_110512.m4a</code>）时，按星期 + 时间对 <code>slots</code>；只有<b>唯一命中</b>才直接采用课表名，多门撞同一时段就交给 AI 按内容判。</li>
+    <li>文件名没带时间时，可以用 <code>--date</code> 手动补上，<b>效果与文件名带时间相同</b>（会去课表定时段并据此定名）。另外：手机转码过的 m4a <b>确实带</b> <code>creation_time</code> 标签，但实测它是<b>转码时刻</b>不是录制时刻（两份录音各 37 分钟，标签只差 9 秒），所以管线不采信它。</li>
+    <li>学期自动区分：<b>9–12 月＝第一学期，1–5 月＝第二学期</b>（你的课表里周二 11:00 两学期都有课，靠这个不会串）。</li>
+    <li><b>第一学期</b>：<code>termStart = 2026-09-28</code>（你确认过，与官方一致）→ 周次过滤已开启：第 0 周＝迎新周（9/21–9/27），第 1–11 周为教学周，官方教学期 2026-09-28 ～ 12-11。</li>
+    <li><b>第二学期</b>：官方教学期 <b>2027-01-25 ～ 2027-05-07</b>（<a href="https://www.leeds.ac.uk/term-dates">leeds.ac.uk/term-dates</a> 2026/27）。PDF 里的「14–24 周」<b>夹着复活节闭校</b>（21 周之后直接跳 22 周），无法换算成日期，所以第二学期不用周次过滤，只按星期 + 时间 + 教学窗口匹配。</li>
+    <li><b>教学窗口外一律不按时间匹配</b>：圣诞假（12/24–1/1）、第一学期结束后、第二学期结束后、暑期 6–8 月、以及学期之间的空档。这时交给 AI 按内容起名，避免假期里的录音被误配成某门课。</li>
+    <li><b>课表不填也不影响使用</b>：这一段自动跳过，退回「AI 自己起名」。</li>
+  </ul>
+  <div class="note"><b>为什么不能只看时间？</b>手机录音的容器里经常没有录制时间——实测你那份 m4a 里就没有，Windows 显示的创建/修改时间是<b>你拷进电脑的时间</b>（那份文件显示 00:25，而课是白天上的）。所以只有「文件名自带日期时间」才用它定时段，其余情况交给 AI 按内容认课。</div>
+</section>
+
+<section>
+  <h2>换模型（可选）</h2>
+  <p>本机现有两套可用的转写模型，可随时切换、互不影响：</p>
+  <table>
+    <thead><tr><th>模型</th><th>体积</th><th>速度（实测）</th><th>适用</th></tr></thead>
+    <tbody>
+      <tr><td>ggml-large-v3-turbo-q8_0.bin<b>（当前默认）</b></td><td>834 MB</td><td><b>26.5 分钟录音 → 47~59 秒</b>（≈27~34× 实时）</td><td>日常默认：比 q5_0 精度略高，速度几乎一样</td></tr>
+      <tr><td>ggml-large-v3-turbo-q5_0.bin</td><td>547 MB</td><td>略快，约 29× 实时</td><td>更省显存；显存紧张时切成它</td></tr>
+    </tbody>
+  </table>
+  <h3>只这一次用别的模型</h3>
+  <pre>把录音丢进 录音\  →  运行：
+一键出笔记.cmd --model "D:\path\to\whisper\models\ggml-large-v3-turbo-q5_0.bin"</pre>
+  <h3>长期切换成默认</h3>
+  <p>改本目录的 <code>config.json</code>（路径按需改）：</p>
+  <pre>{
+  "model": "D:\\path\\to\\whisper\\models\\ggml-large-v3-turbo-q5_0.bin",
+  "diarize": false
+}</pre>
+  <p><b>现在这份 config.json 已经把默认固定成了 turbo-q8_0</b>（上面第一行就是它）。若删掉 config.json，管线会按内置顺序自己挑：<b>先 q5_0，再 q8_0</b>。</p>
+  <div class="note"><b>关于显存（重要实测结论）</b>：turbo 档（834 MB / 547 MB）在你的 4 GB 显存上都很稳。真正会翻车的是那个 1.5 GB 的 <code>ggml-large-v3-q8_0.bin</code>——空载时能跑（10× 实时），但浏览器等程序占用显存后，驱动会把它挤到系统内存，速度暴跌到 <b>0.4× 实时（慢 40~66 倍）</b>，同一段音频耗时在 12 秒到 193 秒之间跳。它和 2.9 GB 的量化源文件 <code>ggml-large-v3.bin</code> 已于 2026-09-22 <b>一并删除</b>，不要再去找。<br>
+  管线内置两层保护：<b>①单次卡死保护</b>——某一次转写超过「这一段时长 ÷ 2」秒（至少 90 秒）仍未完成，就终止并换下一个参数档/模型；<b>②长录音分段</b>（2026-10-13 起）——超过 20 分钟的录音切成约 10 分钟一段、<b>逐段判定质量</b>，所以不会再出现「105 分钟里只有 8 分钟有杂音 → 整条重试十几遍、磨 50 分钟」的情况。</div>
+</section>
+
+<section>
+  <h2>周复习台 &amp; 发言人分离</h2>
+  <h3>周复习台（每周一次，复习用）</h3>
+  <ul>
+    <li>双击 <code>周复习.cmd</code>，会把<strong>本周所有笔记</strong>合成一页：课程卡片（含当日笔记链接）、知识地图（各课导图第一层）、术语汇总（去重 + 出处）、跨课抽查（每周随机抽 15 题）、待办汇总。</li>
+    <li>产物在 <code>课堂笔记\复习台\&lt;年&gt;-W&lt;周&gt;.html</code>，同样是六主题、双击即开。</li>
+    <li>它只汇总<b>同一周</b>的笔记；<code>node weekly-review.js --list</code> 可以先看哪几周有内容。</li>
+  </ul>
+  <h3>发言人分离（实测结论：不可用，保持关闭）</h3>
+  <ul>
+    <li>默认关闭。加 <code>--diarize</code> 开关，或在本目录 <code>config.json</code> 里写 <code>{"diarize": true}</code> 常开。</li>
+    <li>它会多产出一份 <strong>讲者稿</strong>（<code>[时间] 主讲/其他人：句子</code>）。长录音需要几分钟（CPU 推理）。</li>
+    <li><b>两次实测都没法用</b>：8.7 dB 的远场录音覆盖率 36%；即便信噪比好到 <b>15.2 dB</b> 的导师小组讨论，也是 <b>覆盖率 49%、分出 107 位发言人</b>（实际只有 6~8 人），<b>连导师本人的开场独白都被标成「其他人」</b>。</li>
+    <li>所以现在：覆盖率低于 60% 时，<b>笔记里不再报「N 位」这个数字，直接写「分离不可靠」</b>；讲者稿顶部也会加警告头。别指望它告诉你「谁在说话」。</li>
+  </ul>
+</section>
+
+<section>
+  <h2>出问题先看这张表</h2>
+  <table>
+    <thead><tr><th>症状</th><th>原因与处理</th></tr></thead>
+    <tbody>
+      <tr><td>笔记还是旧样子</td><td>浏览器缓存。按 <code>Ctrl+F5</code> 强制刷新；管线自动打开时会带 <code>?v=时间戳</code> 绕开缓存</td></tr>
+      <tr><td>左栏少了某个视图</td><td>不是故障：<b>本次没生成内容的视图不显示</b>。想确认可以打开同目录的 <code>.json</code> 看该字段是否为空</td></tr>
+      <tr><td>点时间点不跳转</td><td>回听副本被删了。确认 <code>音频\&lt;课程&gt;\</code> 里那份 .m4a 还在（时间戳仍会显示，只是点了不动）</td></tr>
+      <tr><td>转写结果大段重复同一句</td><td>音频电平过低/远处收音。管线会自动换参数档重试；<b>长录音还会分段处理，循环重复的碎片会被清掉、确实没人声的那段整段丢弃</b>（日志里写明「丢弃第 N 段…」）；仍不行就坐近一点重录</td></tr>
+      <tr><td>转写磨很久／好像一直不结束</td><td>看日志：长录音会逐段写「第 k/N 段」，某一小段反复重试才会慢（每段上限＝段长的一半，约 300 秒）。想更快就把段切小：<code>--chunk-sec 300</code>；只想看它在哪一段卡住，直接读 <code>日志\</code> 里最新那份</td></tr>
+      <tr><td>转写内容明显变少</td><td>可能开了 <code>--vad</code>。去掉该开关（实测远场弱录音下 VAD 会裁掉真语音）</td></tr>
+      <tr><td>提示「整段近乎无声」</td><td>该音频确实没有语音，或手机录音被静音键拦截——先 <code>--stats</code> 体检</td></tr>
+      <tr><td>提示找不到 Key</td><td>跑 <code>node make-notes.js --check</code>；<code>--where</code> 会告诉你它实际从哪读的（正常是 <code>%USERPROFILE%\.dsh\.env</code>）</td></tr>
+      <tr><td>学习台里没有课堂卡</td><td>确认 <code>English Learning\notes-cards.js</code> 存在；然后在学习台按 F5 刷新</td></tr>
+      <tr><td>专有名词总错</td><td>把正确拼写加进 <code>whisper\terms-manual.txt</code>，再跑 <code>--build-prompt</code>，下次转写自动带上</td></tr>
+      <tr><td>笔记内容和录音对不上</td><td>跑 <code>node _verify-transcript.js</code> 体检转写稿：<b>静音段最容易被凭空编话</b>。再拿笔记里的断言回 grep 转写稿原文核对（能对上才算这份笔记可信）</td></tr>
+      <tr><td>课间／没人讲课的地方冒出莫名其妙的话</td><td>转写稿里那些「<code>I'm just going to put it on the plane.</code>」之类就是模型在静音处编的。用 <code>node trim-transcript.js --from 54:18 --to 1:02:57</code> 先<b>预演</b>看看删哪几段（加 <code>--yes</code> 才真删，写前自动备份），再双击 <code>生成笔记.cmd</code> 更新笔记。<b>窗口要自己给</b>：从 srt 里找「课间宣布」那句和复课那句之间的时间</td></tr>
+      <tr><td>同步时提示「清单已失效 N 条」</td><td>你之前取消勾选的卡因为笔记改写法而对不上了。双击 <code>选卡.cmd</code> 到底部那块逐条处理，或跑 <code>node rematch-excluded.js</code> 看候选项</td></tr>
+      <tr><td>双击 .cmd 一闪而过</td><td>说明运行时出错。在该目录打开终端，直接跑 <code>node make-notes.js ...</code> 看报错；或看 <code>日志\</code> 里最新的日志</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <h2>已知边界（诚实版）</h2>
+  <ul>
+    <li><b>长课会拆成多段分别生成再合并</b>：拆分阈值 <b>1.8 万字符</b>（约 25 分钟一段）——每段有独立的 8000 token 输出预算，
+      所以课越长、段越多，笔记正文能写得越厚（实测 95 分钟的课分 5 段，正文从 3,911 加厚到 <b>9,153 字符</b>）。
+      代价是 API 次数按段数增加；正文里会看到「【第 N 部分】」的分隔标记。</li>
+    <li><b>静音处可能凭空编话</b>：实测一份 38.3 分钟的讲座，开头 1 分 40 秒（录音里没人说话）被编出整段假台词，英文稿里还蹦出中文。管线现在会自动质检并剔除确凿的幻觉段；<b>但笔记生成后仍建议拿 3–5 条断言回 grep 转写稿核对</b>（实测模型会自己跳过首尾垃圾，可仍值得核一次）。</li>
+    <li><b>人名地名仍会错</b>：8.7 dB 信噪比的远场录音里，“某位老师”被转成“DeCone”、Parkinson 被转成 Atkinson。软件救不回来，只能靠坐近 + 术语表补。</li>
+    <li><b>发言人分离不可用</b>：引擎已装好（sherpa-onnx，离线、无需 token），但两次实测（8.7 dB → 覆盖率 36%；15.2 dB → 覆盖率 49% 且分出 107 位）都不靠谱——笔记里已改为直说「分离不可靠」，不再报数字。</li>
+    <li><b>时间戳依赖音频文件</b>：内嵌播放器引用 <code>课堂笔记\音频\</code> 里的副本；若删掉该副本，时间戳仍显示但点击不会再跳转。</li>
+    <li><b>音频不离开本机</b>，但转写稿会发给 DeepSeek 做笔记——介意的话可以只用 <code>--only</code> 拿转写稿。</li>
+    <li><b>课名不是 100% 保证正确</b>：文件名带日期时间的录音是<b>确定性</b>匹配（星期+时间+教学窗口 → 课表课时）；文件名不带时间时靠 AI 读内容从课表里认课，<b>偶尔会认错</b>（实测把它认成过模块课）。所以每次生成后<b>扫一眼笔记文件名</b>；认错了就编辑 <code>课程.json</code> 把课名改成正确的，下次同名文件自动沿用。</li>
+    <li><b>课件只能提文字</b>：你这门课的 299 页课件**每页都有文字层**，所以全提得到；但<b>纯图片/扫描版幻灯片提不到内容</b>（本机没有视觉模型）。图片里的示意图、表格截图，只能靠录音里的讲解补。</li>
+    <li><b>课件核对不是逐字比对</b>：它挑的是术语/数字/公式/定义这类<b>对不上就要出事</b>的地方（实测一份 95 分钟课核出 29 项），不是把整份课件逐句比一遍。判成「课件未提及」的意思是<b>幻灯片上没有</b>——可能只是老师口头补充（那种往往是考点），也可能是课件里放在别的讲。</li>
+    <li><b>失败的文件会留在 录音\ 里</b>：太短/没声音的录音会被跳过（提示「转写稿只有 N 字符」），批量结束后会汇总成功/失败个数。误录的空文件自己删掉即可；真课重跑很便宜（转写稿已存）。</li>
+    <li><b>课表是暂定的</b>：PDF 自己写着 provisional，而且第一学期目前只公布出 DEMO1006M 与 DEMO1001M 的讲座。开学后课表若更新，把新 PDF 发我重新提取。</li>
+    <li><b>键盘还没做全</b>：目前只有问答页的空格（显示答案）与 ←→（翻题）。<code>1–7</code> 切视图、<code>/</code> 聚焦术语快查这些还没有。</li>
+    <li><b>没有自动视觉回归</b>：设计底线靠 <code>_verify-output.js</code> 的 41 项断言 + 人工截图复核；改版式后建议在真实笔记上截图确认一遍。</li>
+    <li><b>录音需老师同意</b>（利兹政策），且只作个人学习用途。</li>
+  </ul>
+</section>
+
+</main>
+<footer>课堂笔记系统 · 使用说明 v4.1 ｜ 更新于 2026-09-29 ｜ 主题选择会记住</footer>
+<script>
+(function(){
+  var T=['paper','forest','cobalt','dusk','jade','aurora'],K='guide-theme';
+  function sys(){ return window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dusk':'paper'; }
+  function apply(t){
+    if(T.indexOf(t)<0)t=sys();
+    document.body.setAttribute('data-theme',t);
+    Array.prototype.forEach.call(document.querySelectorAll('.sw'),function(b){
+      b.setAttribute('aria-pressed', b.getAttribute('data-theme')===t?'true':'false');
+    });
+  }
+  apply(localStorage.getItem(K)||sys());
+  Array.prototype.forEach.call(document.querySelectorAll('.sw'),function(b){
+    b.onclick=function(){ var t=b.getAttribute('data-theme'); localStorage.setItem(K,t); apply(t); };
+  });
+})();
+</script>
+</body>
+</html>

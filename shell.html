@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title><!--TITLE--> · 课堂笔记</title>
+<style>
+/* ==========================================================================
+   课堂笔记 · 阅读版式
+   6 套主题，每套一个强强调色 + 同色系微光；不做卡片堆叠，靠字阶、留白与细线
+   组织信息。全离线自包含：只用系统字体、内联 SVG 与 CSS，不引用任何外部资源。
+   ========================================================================== */
+:root{
+  /* 中文优先：拉丁字形走系统 UI 体，汉字走系统 CJK 体 */
+  --sans:system-ui,-apple-system,"Segoe UI",-apple-system,"PingFang SC","Hiragino Sans GB","Microsoft YaHei UI","Microsoft YaHei","Noto Sans SC","Source Han Sans SC",sans-serif;
+  --mono:ui-monospace,"Cascadia Mono","SF Mono","SFMono-Regular",Consolas,"Liberation Mono",monospace;
+  --col:68ch;                     /* 正文测量宽度 */
+  --wrap:1180px;                  /* 版心 */
+  --rail:216px;                   /* 目录栏 */
+  --gutter:64px;
+  --r:16px; --r-sm:10px; --r-xs:8px;
+  --ease:cubic-bezier(.16,1,.3,1);
+  /* 字阶：相邻层级固定 1.26 倍，最小层级（h4）对正文 ≥1.24 倍 */
+  --step:1.26;
+  --fs-body:16.5px; --fs-small:13px; --fs-h4:19px; --fs-h3:24px; --fs-h2:30px;
+  --lh-tight:1.2; --lh-body:1.76;
+}
+/* ---------- ① 纸墨（暖白纸 + 朱砂） ---------- */
+body[data-theme="paper"]{
+  color-scheme:light;
+  --bg:#f4f1ec; --surface:#fffefb; --ink:#1a1815; --ink-soft:#46423c; --ink-mute:#635d55;
+  --line:#e0dad0; --line-soft:#ebe6dd; --accent:#a63d2f; --accent-ink:#8f3427;
+  --wash:#f1e7e2; --wash2:#ecdcd5; --glow1:rgba(166,61,47,.10); --glow2:rgba(140,120,90,.10);
+}
+/* ---------- ② 松林（冷白绿调 + 松针绿） ---------- */
+body[data-theme="forest"]{
+  color-scheme:light;
+  --bg:#f2f5f0; --surface:#fdfefb; --ink:#15201a; --ink-soft:#3d4a41; --ink-mute:#5c6a60;
+  --line:#dbe3da; --line-soft:#e8efe8; --accent:#2a6345; --accent-ink:#24523a;
+  --wash:#e7f0ea; --wash2:#dcebdf; --glow1:rgba(42,99,69,.11); --glow2:rgba(130,180,140,.10);
+}
+/* ---------- ③ 深海（冷白 + 钴蓝） ---------- */
+body[data-theme="cobalt"]{
+  color-scheme:light;
+  --bg:#f3f6fb; --surface:#ffffff; --ink:#121a26; --ink-soft:#3f4a59; --ink-mute:#5f6b7b;
+  --line:#dde4ee; --line-soft:#eaeff7; --accent:#1f4bb8; --accent-ink:#1d429e;
+  --wash:#e8eefc; --wash2:#dde7fa; --glow1:rgba(31,75,184,.10); --glow2:rgba(90,160,220,.10);
+}
+/* ---------- ④ 夜航（深蓝灰分层 + 琥珀） ---------- */
+body[data-theme="dusk"]{
+  color-scheme:dark;
+  --bg:#13151d; --surface:#1b1e28; --ink:#eceae9; --ink-soft:#c1bfc8; --ink-mute:#9492a0;
+  --line:#2e3240; --line-soft:#252936; --accent:#e6ab63; --accent-ink:#f0bd7d;
+  --wash:#241f1d; --wash2:#2c2622; --glow1:rgba(230,171,99,.10); --glow2:rgba(120,110,200,.10);
+}
+/* ---------- ⑤ 墨玉（墨绿黑分层 + 翡翠） ---------- */
+body[data-theme="jade"]{
+  color-scheme:dark;
+  --bg:#111613; --surface:#19211d; --ink:#e6efea; --ink-soft:#bcc8c2; --ink-mute:#8d9c95;
+  --line:#28332d; --line-soft:#202824; --accent:#63d9b0; --accent-ink:#82e2bd;
+  --wash:#1a231f; --wash2:#1f2a24; --glow1:rgba(99,217,176,.10); --glow2:rgba(70,150,160,.10);
+}
+/* ---------- ⑥ 紫夜（紫黑分层 + 薰衣草） ---------- */
+body[data-theme="aurora"]{
+  color-scheme:dark;
+  --bg:#151129; --surface:#1d1836; --ink:#eae7f3; --ink-soft:#c0bad4; --ink-mute:#9690ae;
+  --line:#2d2650; --line-soft:#241e3d; --accent:#ad92ff; --accent-ink:#c2adff;
+  --wash:#211b3d; --wash2:#282147; --glow1:rgba(173,146,255,.12); --glow2:rgba(95,195,250,.10);
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+@media (prefers-reduced-motion:no-preference){ html{scroll-behavior:smooth} }
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);
+  font-size:var(--fs-body);line-height:var(--lh-body);font-weight:400;
+  -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
+  text-rendering:optimizeLegibility;font-kerning:normal;
+  font-variant-numeric:proportional-nums;
+  transition:background .32s var(--ease),color .32s var(--ease)}
+/* 暗色主题给背景留一层极淡的层次，避免一片死黑 */
+body:is([data-theme="dusk"],[data-theme="jade"],[data-theme="aurora"]){
+  background-image:
+    radial-gradient(120% 80% at 50% -20%, var(--glow1) 0%, transparent 55%),
+    radial-gradient(90% 60% at 100% 100%, var(--glow2) 0%, transparent 60%);
+  background-repeat:no-repeat,no-repeat;
+}
+
+/* ---------- 浏览器表面：选区、光标、焦点、滚动条 ---------- */
+::selection{background:color-mix(in srgb,var(--accent) 26%,transparent);color:var(--ink);text-shadow:none}
+:where(input,textarea){caret-color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:var(--r-xs)}
+*{scrollbar-width:thin;scrollbar-color:color-mix(in srgb,var(--ink) 22%,transparent) transparent}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:color-mix(in srgb,var(--ink) 18%,transparent);border:3px solid transparent;
+  background-clip:padding-box;border-radius:999px}
+::-webkit-scrollbar-thumb:hover{background:color-mix(in srgb,var(--ink) 34%,transparent);background-clip:padding-box}
+
+a{color:var(--accent-ink);text-decoration:none;
+  border-bottom:1px solid color-mix(in srgb,var(--accent) 34%,transparent);
+  transition:border-color .18s,color .18s}
+a:hover{border-bottom-color:var(--accent)}
+.skip{position:absolute;left:-9999px}
+.skip:focus{left:14px;top:14px;background:var(--surface);border:1px solid var(--line);padding:9px 14px;
+  border-radius:var(--r-sm);z-index:20;border-bottom-color:var(--line)}
+
+.progress{position:fixed;inset:0 0 auto 0;height:2px;z-index:9;pointer-events:none;overflow:hidden}
+.progress i{display:block;height:100%;width:0;background:var(--accent);will-change:width}
+
+/* ---------- 报头：排版主导 + 一层同色微光 ---------- */
+.hero{position:relative;border-bottom:1px solid var(--line);background:
+    radial-gradient(112% 128% at 6% -14%, var(--glow1) 0%, transparent 56%),
+    radial-gradient(86% 108% at 94% -6%, var(--glow2) 0%, transparent 60%),
+    var(--bg)}
+.hero-in{max-width:var(--wrap);margin:0 auto;padding:60px 26px 34px}
+h1{font-size:clamp(32px,5vw,54px);line-height:1.06;letter-spacing:-.032em;margin:0;
+  font-weight:680;max-width:26ch;text-wrap:balance}
+h1 .say{margin-left:14px;vertical-align:.4em;width:30px;height:30px;border-radius:9px}
+h1 .say svg{width:16px;height:16px}
+h1 .say:hover{opacity:1}
+.lead{margin:22px 0 0;font-size:20px;line-height:1.62;color:var(--ink-soft);max-width:48ch;letter-spacing:.002em}
+.facts{margin:30px 0 0;padding-top:18px;border-top:1px solid var(--line-soft);
+  display:flex;flex-wrap:wrap;gap:9px 22px;font-size:var(--fs-small);color:var(--ink-mute)}
+.facts b{font-weight:600;color:var(--ink-soft);margin-right:7px;letter-spacing:.015em}
+.facts span{font-variant-numeric:tabular-nums}
+.facts>div{position:relative;padding-right:20px}
+.facts>div:not(:last-child)::after{content:"";position:absolute;right:0;top:.42em;bottom:.42em;width:1px;background:var(--line)}
+
+/* 时间戳 + 音频定位：点时间戳跳到录音对应位置 */
+.ts{font-family:var(--mono);font-size:12px;line-height:1.5;font-variant-numeric:tabular-nums;letter-spacing:-.01em;
+  color:var(--accent-ink);background:var(--wash);border:1px solid color-mix(in srgb,var(--accent) 20%,transparent);
+  border-radius:6px;padding:1px 6px 2px;margin-right:9px;cursor:pointer;display:inline-block;vertical-align:.06em;
+  transition:border-color .16s,background .16s,color .16s}
+.ts:hover{border-color:var(--accent);background:var(--wash2)}
+.ts.plain{cursor:default;border-color:transparent;background:color-mix(in srgb,var(--wash) 60%,transparent)}
+.ts.plain:hover{border-color:transparent;background:color-mix(in srgb,var(--wash) 60%,transparent)}
+.player{display:flex;align-items:center;gap:16px;margin:26px 0 0;padding:13px 16px;border:1px solid var(--line);
+  border-radius:var(--r-md,14px);background:linear-gradient(180deg,color-mix(in srgb,var(--surface) 88%,var(--wash)) 0%,var(--surface) 100%);
+  box-shadow:inset 0 1px 0 color-mix(in srgb,#fff 6%,transparent);max-width:var(--col)}
+.player audio{flex:1;height:38px;min-width:0}
+.player .hint{font-size:12.5px;color:var(--ink-mute);white-space:nowrap;letter-spacing:.01em}
+
+/* ---------- 工具条 ---------- */
+.bar{display:flex;flex-wrap:wrap;gap:9px;align-items:center;margin:28px 0 0}
+.bar .spacer{flex:1 1 auto}
+button{font:inherit;font-size:13px;line-height:1.5;color:var(--ink-soft);background:var(--surface);
+  border:1px solid var(--line);border-radius:var(--r-sm);padding:7px 14px;cursor:pointer;
+  display:inline-flex;align-items:center;gap:8px;letter-spacing:.01em;
+  transition:transform .18s var(--ease),border-color .18s,color .18s,background .18s}
+button:hover{border-color:color-mix(in srgb,var(--accent) 62%,var(--line));color:var(--accent-ink);background:color-mix(in srgb,var(--surface) 82%,var(--wash))}
+button:active{transform:translateY(1px)}
+button:disabled{opacity:.5;cursor:not-allowed}
+button svg{width:15px;height:15px;flex:none;stroke-width:1.7}
+.themes{display:flex;gap:8px;align-items:center}
+.themes .lbl{font-size:12px;color:var(--ink-mute);margin-right:2px;letter-spacing:.04em}
+.sw{width:22px;height:22px;padding:0;border-radius:50%;border:1px solid var(--line);cursor:pointer;position:relative;
+  background:var(--surface);display:grid;place-items:center;
+  transition:transform .18s var(--ease),border-color .18s,box-shadow .18s}
+.sw:hover{transform:scale(1.1);border-color:color-mix(in srgb,var(--accent) 55%,var(--line))}
+.sw[aria-pressed="true"]{border-color:transparent;box-shadow:inset 0 0 0 2px var(--accent)}
+.sw i{width:11px;height:11px;border-radius:50%;display:block}
+
+/* ---------- 两栏骨架 ---------- */
+.shell{max-width:var(--wrap);margin:0 auto;padding:0 26px 104px}
+.layout{display:grid;grid-template-columns:1fr;gap:0}
+@media (min-width:1080px){
+  .layout{grid-template-columns:var(--rail) minmax(0,1fr);gap:0 var(--gutter)}
+  .toc{position:sticky;top:26px;align-self:start;max-height:calc(100vh - 52px);overflow-y:auto;
+    overflow-x:hidden;overscroll-behavior:contain}
+}
+.toc nav{padding-top:40px}
+.toc h2{font-size:12.5px;font-weight:620;color:var(--ink-mute);margin:0 0 14px;letter-spacing:.06em}
+.toc ol{list-style:none;margin:0;padding:0;counter-reset:toc}
+.toc li{margin:1px 0}
+.toc a{display:block;padding:6px 0 6px 13px;font-size:13.5px;line-height:1.5;color:var(--ink-soft);border:0;
+  border-left:1px solid transparent;transition:color .18s,border-color .18s}
+.toc a::before{counter-increment:toc;content:counter(toc,decimal-leading-zero);font-family:var(--mono);
+  font-size:11px;font-variant-numeric:tabular-nums;color:var(--ink-mute);margin-right:9px;opacity:.85}
+.toc a:hover{color:var(--accent-ink);border-left-color:color-mix(in srgb,var(--accent) 45%,transparent)}
+.toc a:hover::before{color:var(--accent)}
+.toc a.on{color:var(--accent-ink);border-left-color:var(--accent);font-weight:600}
+
+main{min-width:0;counter-reset:sec}
+section{padding-top:52px;margin-top:58px;border-top:1px solid var(--line-soft);scroll-margin-top:30px;counter-increment:sec}
+section:first-of-type{border-top:0;margin-top:38px;padding-top:14px}
+h2.sec{font-size:var(--fs-h2);line-height:1.24;letter-spacing:-.022em;margin:0 0 24px;font-weight:660;
+  text-wrap:balance;max-width:30ch}
+/* 章节序号：与左侧目录的两位编号呼应，形成阅读节奏 */
+h2.sec::before{content:counter(sec,decimal-leading-zero);display:block;margin-bottom:11px;
+  font-family:var(--mono);font-size:12px;font-weight:600;letter-spacing:.18em;color:var(--accent);opacity:.9}
+h2.sec::after{content:"";display:block;width:46px;height:2px;border-radius:2px;background:var(--accent);
+  margin-top:14px;opacity:.85}
+/* 小节标题旁的“连读本节英文”：和句子旁的朗读按钮同一套语言 */
+h2.sec .say{margin:0 0 0 12px;vertical-align:.12em}
+h2.sec .say:hover{opacity:1}
+
+/* 行内公式（离线由 LaTeX 转成 Unicode/上下标）：只做轻微区分，不引入数学字体 */
+.tex{font-variant-numeric:tabular-nums;letter-spacing:.01em;white-space:nowrap}
+.tex sub,.tex sup{font-size:.72em;line-height:0}
+
+/* ---------- 核心要点：双栏 + 序号栏 ---------- */
+ol.points{list-style:none;margin:0;padding:0;counter-reset:p;position:relative}
+@media (min-width:980px){
+  ol.points{display:grid;grid-template-columns:1fr 1fr;gap:0 44px}
+  /* 双栏之间的细分隔线：让两栏读起来是一张表，而不是两段文字 */
+  ol.points::before{content:"";position:absolute;left:calc(50% + 22px);top:4px;bottom:4px;width:1px;background:var(--line-soft)}
+}
+ol.points li{counter-increment:p;position:relative;padding:18px 0 18px 46px;border-bottom:1px solid var(--line-soft)}
+ol.points li::before{content:counter(p,decimal-leading-zero);position:absolute;left:0;top:19px;font-size:14px;
+  font-weight:640;font-variant-numeric:tabular-nums;letter-spacing:.02em;color:var(--accent);opacity:.92}
+ol.points li:last-child{border-bottom:0}
+@media (min-width:980px){ ol.points li:nth-last-child(-n+2){border-bottom:0} }
+
+/* ---------- 结构化笔记 ---------- */
+.prose{max-width:var(--col)}
+.prose h3{font-size:var(--fs-h3);line-height:1.3;margin:40px 0 12px;letter-spacing:-.018em;font-weight:650;
+  padding-top:20px;border-top:1px solid var(--line-soft);text-wrap:balance}
+.prose h3:first-child{margin-top:0;padding-top:0;border-top:0}
+.prose h4{font-size:var(--fs-h4);line-height:1.4;margin:26px 0 9px;font-weight:650;color:var(--ink);
+  letter-spacing:-.008em}
+.prose h5{font-size:15.5px;margin:20px 0 8px;font-weight:650;color:var(--ink-soft);letter-spacing:.008em}
+.prose p{margin:0 0 15px}
+.prose ul,.prose ol{margin:0 0 17px;padding-left:23px}
+.prose li{margin:8px 0;padding-left:2px}
+.prose li::marker{color:color-mix(in srgb,var(--accent) 80%,var(--ink-mute))}
+.prose strong{font-weight:660;color:var(--ink)}
+.prose em{font-style:italic;color:var(--ink-soft)}
+.prose blockquote{margin:20px 0;padding:2px 0 2px 18px;border-left:1px solid color-mix(in srgb,var(--accent) 52%,transparent);
+  color:var(--ink-soft);font-style:normal}
+.prose blockquote p:last-child{margin-bottom:0}
+.prose hr{border:0;border-top:1px solid var(--line-soft);margin:30px 0}
+code,.kbd{font-family:var(--mono);font-variant-numeric:tabular-nums}
+code{font-size:.87em;background:var(--wash);border:1px solid color-mix(in srgb,var(--accent) 16%,transparent);
+  padding:1px 6px 2px;border-radius:6px;color:var(--accent-ink)}
+.kbd{font-size:11px;color:var(--ink-mute);border:1px solid var(--line);border-radius:5px;padding:1px 5px;
+  background:var(--surface)}
+.flag{display:inline-block;background:color-mix(in srgb,var(--accent) 15%,transparent);
+  color:var(--accent-ink);border:1px solid color-mix(in srgb,var(--accent) 28%,transparent);
+  border-radius:6px;padding:0 6px 1px;font-size:.82em;font-weight:600;letter-spacing:.02em;vertical-align:.06em}
+/* 空状态（“（本次没有生成…）”）统一收成安静的一行 */
+.prose p:has(> span.mute){color:var(--ink-mute);font-size:14.5px}
+
+/* ---------- 中英对照：双栏 + 细分隔 ---------- */
+.bi{display:grid;grid-template-columns:1fr;gap:0}
+@media (min-width:900px){ .bi{grid-template-columns:1fr 1fr;column-gap:44px} }
+.bi .pair{padding:16px 14px 16px 0;border-top:1px solid var(--line-soft);transition:background .18s}
+.bi .pair:hover{background:color-mix(in srgb,var(--wash) 55%,transparent)}
+.bi .en{margin:0;font-size:16.5px;line-height:1.62;color:var(--ink)}
+.bi .zh{margin:8px 0 0;font-size:14.5px;line-height:1.72;color:var(--ink-mute)}
+.bi .idx{display:inline-block;min-width:19px;font-size:12px;font-variant-numeric:tabular-nums;
+  color:var(--accent);font-weight:700;margin-right:9px;letter-spacing:.02em}
+/* 朗读按钮：英文原句可点读（浏览器内置语音，离线可用） */
+.say{width:26px;height:26px;padding:0;justify-content:center;border-radius:7px;vertical-align:-6px;margin-left:2px;
+  background:var(--surface);border-color:var(--line);opacity:.55;
+  transition:opacity .18s,border-color .18s,color .18s,background .18s}
+.say svg{width:14px;height:14px}
+.say:hover{opacity:1;background:var(--wash)}
+.say.on{opacity:1;border-color:var(--accent);color:var(--accent);background:var(--wash)}
+.bi .pair:hover .say,table.terms tr:hover .say{opacity:1}
+
+/* ---------- 术语表：三线表（无竖线、无内横线） ---------- */
+.tablewrap{overflow-x:auto;overscroll-behavior-x:contain;max-width:100%}
+table.terms{width:100%;min-width:560px;border-collapse:collapse;font-size:14.5px}
+table.terms th{position:sticky;top:0;z-index:1;text-align:left;font-weight:620;font-size:12.5px;
+  color:var(--ink-mute);letter-spacing:.06em;padding:0 16px 9px 0;background:var(--bg);
+  border-bottom:1px solid color-mix(in srgb,var(--ink) 78%,var(--line));white-space:nowrap}
+table.terms td{padding:12px 16px 12px 0;border-bottom:1px solid var(--line-soft);vertical-align:top;line-height:1.68}
+table.terms tbody tr:last-child td{border-bottom:1px solid color-mix(in srgb,var(--ink) 78%,var(--line))}
+table.terms tbody tr{transition:background .18s}
+table.terms tbody tr:hover{background:color-mix(in srgb,var(--wash) 62%,transparent)}
+table.terms td:first-child{color:var(--ink);font-weight:600;white-space:nowrap}
+table.terms td:first-child .say{margin-left:9px}
+table.terms td:nth-child(2){color:var(--ink-soft)}
+table.terms td:last-child{color:var(--ink-mute);padding-right:0}
+
+/* ---------- 课件核对：用同一套三线表，但列宽要重排（术语表的首列 nowrap 会挤掉「课件说法」） ---------- */
+.ho-src{font-size:12.5px;color:var(--ink-mute);margin:-10px 0 12px}
+table.terms.ho th:nth-child(1){width:13%}
+table.terms.ho th:nth-child(2){width:25%}
+table.terms.ho th:nth-child(3){width:40%}
+table.terms.ho th:nth-child(4){width:22%}
+table.terms.ho td:first-child{white-space:normal;font-weight:620}
+table.terms.ho td{padding-right:14px}
+.ho-v{display:inline-block;font-size:12px;line-height:1.6;padding:1px 9px;border-radius:999px;white-space:nowrap;
+  background:color-mix(in srgb,var(--ink) 8%,transparent);color:var(--ink-soft)}
+.ho-v.fix{background:color-mix(in srgb,var(--accent) 15%,transparent);color:var(--accent-ink);font-weight:620}
+.ho-v.same{background:color-mix(in srgb,var(--wash) 70%,transparent);color:var(--ink-mute)}
+.ho-extra{margin:16px 0 0;padding-left:20px;font-size:14.5px;color:var(--ink-soft)}
+.ho-extra li{margin:6px 0}
+
+/* ---------- 思维导图：分层底色 + 细引导线 ---------- */
+ul.tree,ul.tree ul{list-style:none;margin:0;padding:0}
+ul.tree ul{margin-left:10px;padding-left:24px;border-left:1px solid var(--line)}
+ul.tree li{position:relative;padding:3px 0}
+ul.tree .row{display:flex;align-items:flex-start;gap:9px}
+ul.tree .tog{flex:none;width:19px;height:19px;margin-top:2px;padding:0;border:1px solid var(--line);
+  border-radius:6px;background:var(--surface);color:var(--ink-mute);display:grid;place-items:center;cursor:pointer;
+  transition:border-color .18s,color .18s,background .18s}
+ul.tree .tog:hover{border-color:var(--accent);color:var(--accent);background:var(--wash)}
+ul.tree .tog svg{width:10px;height:10px;transition:transform .22s var(--ease)}
+ul.tree li.open>.row>.tog svg{transform:rotate(90deg)}
+ul.tree .lbl{font-size:14px;line-height:1.58;color:var(--ink-soft);background:var(--wash);border-radius:var(--r-xs);
+  padding:3px 11px 4px;transition:background .18s}
+ul.tree>li>.row>.lbl{font-size:15.5px;font-weight:640;color:var(--ink);background:var(--wash2);padding:5px 13px 6px}
+ul.tree>li>ul>li>.row>.lbl{font-weight:600;color:var(--ink);background:var(--wash)}
+ul.tree li:not(.open)>ul{display:none}
+ul.tree .leafmark{flex:none;width:19px;height:19px;margin-top:5px;display:grid;place-items:center}
+ul.tree .leafmark i{width:4px;height:4px;border-radius:50%;background:var(--accent);opacity:.4}
+
+/* ---------- 复习问答：渐变描边（全站唯一一张“卡”） ---------- */
+.qa{max-width:var(--col);border:1px solid transparent;border-radius:var(--r);padding:28px 28px 20px;
+  background:linear-gradient(var(--surface),var(--surface)) padding-box,
+             linear-gradient(135deg,color-mix(in srgb,var(--accent) 72%,transparent) 0%,color-mix(in srgb,var(--accent) 18%,transparent) 46%,transparent 80%) border-box;
+  box-shadow:0 1px 2px color-mix(in srgb,var(--ink) 5%,transparent),0 20px 44px -30px color-mix(in srgb,var(--ink) 45%,transparent)}
+.qa .q{font-size:19px;line-height:1.5;font-weight:650;margin:0;letter-spacing:-.012em;min-height:3.2em;color:var(--ink)}
+.qa .a{margin:14px 0 0;font-size:16px;line-height:1.74;color:var(--ink-soft);min-height:3.6em;
+  opacity:0;transform:translateY(-5px);transition:opacity .26s var(--ease),transform .26s var(--ease)}
+.qa.revealed .a{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){ .qa .a{transition:none;opacity:1;transform:none} }
+.qa .ctrl{display:flex;flex-wrap:wrap;align-items:center;gap:9px;margin-top:20px;padding-top:18px;
+  border-top:1px solid var(--line-soft)}
+.qa .count{font-size:12.5px;color:var(--ink-mute);font-variant-numeric:tabular-nums;margin-left:auto;letter-spacing:.02em}
+
+/* ---------- 待办 ---------- */
+ul.todos{list-style:none;margin:0;padding:0;max-width:var(--col)}
+ul.todos li{display:flex;gap:13px;align-items:flex-start;padding:12px 12px 12px 0;border-bottom:1px solid var(--line-soft);
+  border-radius:var(--r-xs);transition:background .18s}
+ul.todos li:hover{background:color-mix(in srgb,var(--wash) 55%,transparent)}
+ul.todos li:last-child{border-bottom:0}
+ul.todos input{margin:6px 0 0;width:16px;height:16px;accent-color:var(--accent);flex:none;cursor:pointer}
+ul.todos label{font-size:15.5px;line-height:1.66;color:var(--ink-soft);cursor:pointer}
+ul.todos li.done label{color:var(--ink-mute);text-decoration:line-through;text-decoration-thickness:1px;
+  text-decoration-color:color-mix(in srgb,var(--ink-mute) 55%,transparent)}
+
+footer{margin-top:68px;padding-top:24px;border-top:1px solid var(--line-soft);color:var(--ink-mute);
+  font-size:12.5px;line-height:2;letter-spacing:.01em}
+
+/* ---------- 入场：一次，克制，同一批错开 ---------- */
+@media (prefers-reduced-motion:no-preference){
+  .reveal{opacity:0;transform:translateY(14px);filter:blur(7px)}
+  .reveal.in{opacity:1;transform:none;filter:none;
+    transition:opacity .62s var(--ease),transform .62s var(--ease),filter .5s var(--ease);
+    transition-delay:calc(var(--i,0) * 70ms)}
+}
+
+@page{margin:14mm 13mm}
+@media print{
+  body{--bg:#fff;--surface:#fff;--ink:#111;--ink-soft:#333;--ink-mute:#555;--line:#c9c9c9;--line-soft:#e3e3e3;
+       --wash:#f3f3f3;--wash2:#ececec;--accent:#7a2318;--accent-ink:#7a2318;
+       background:#fff;background-image:none;color:#111;font-size:11.5pt;line-height:1.62}
+  .progress,.toc,.bar,.player,.qa .ctrl,.noprint,.skip{display:none!important}
+  .hero{background:#fff;border-bottom:1px solid var(--line);padding:0}
+  .hero-in{padding:0 0 12pt}
+  .shell,.hero-in{max-width:none;padding-left:0;padding-right:0}
+  .layout{display:block}
+  h1{font-size:23pt;max-width:none}
+  .lead{font-size:12.5pt;max-width:none;color:#333}
+  h2.sec{font-size:15pt;margin-bottom:10pt}
+  h2.sec::after{background:#111}
+  .prose h3{font-size:12.5pt;margin:16pt 0 6pt;padding-top:0;border-top:0}
+  .prose h4{font-size:11.5pt}
+  .prose,.bi .en,.bi .zh,ul.todos label{color:#111}
+  .prose blockquote,.bi .zh,.qa .a,table.terms td:last-child,table.terms td:nth-child(2){color:#333}
+  section{break-inside:avoid;margin-top:16pt;padding-top:12pt}
+  .qa{box-shadow:none;background:#fff;border:1px solid var(--line);break-inside:avoid}
+  .qa .a{opacity:1;transform:none;color:#333}
+  .say{display:none}
+  .bi .pair{break-inside:avoid}
+  ul.tree li:not(.open)>ul{display:block}
+  ul.tree .lbl{background:transparent;padding:0 0 0 2pt}
+  ul.tree>li>.row>.lbl,ul.tree>li>ul>li>.row>.lbl{background:transparent}
+  .flag{border-color:#999}
+  table.terms{min-width:0;font-size:10.5pt}
+  table.terms thead{display:table-header-group}
+  table.terms th{position:static;background:#fff;border-bottom:1pt solid #111;color:#333}
+  table.terms tbody tr:last-child td{border-bottom:1pt solid #111}
+  .tablewrap{overflow:visible}
+  .reveal{opacity:1;transform:none}
+  *,*::before,*::after{transition:none!important;animation:none!important;box-shadow:none!important}
+  a{color:#111;border:0}
+}
+
+/* ============================================================
+   个人工作台气质层：稿纸点阵 / 章节徽标 / 手绘重点线 / 微交互
+   （离线可用：只用 CSS 与内联 SVG mask，不引外部字体与图片）
+   ============================================================ */
+body{background-image:radial-gradient(color-mix(in srgb,var(--ink) 8%,transparent) 1px,transparent 1.1px);
+  background-size:23px 23px;background-position:-1px -1px}
+
+/* 章节序号：手写徽标，略带倾斜，像贴在册子上的编号贴纸 */
+h2.sec::before{display:flex;align-items:center;justify-content:center;width:max-content;min-width:38px;height:26px;
+  padding:0 10px;margin-bottom:13px;border-radius:9px;transform:rotate(-1.2deg);
+  background:color-mix(in srgb,var(--accent) 15%,transparent);
+  border:1px solid color-mix(in srgb,var(--accent) 34%,transparent);
+  font-family:var(--mono);font-size:12px;font-weight:700;letter-spacing:.12em;color:var(--accent-ink);opacity:1}
+
+/* 标题下的重点线：手绘荧光笔（用 mask 让颜色跟随各主题强调色） */
+h2.sec::after{width:104px;height:9px;margin-top:13px;border-radius:0;background:var(--accent);opacity:.92;
+  -webkit-mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 10' preserveAspectRatio='none'><path d='M2.5 7.6C22 5.4 44 4.2 66 4.9c16 .5 33 1.7 51 3.4' fill='none' stroke='white' stroke-width='3.6' stroke-linecap='round'/><path d='M7 9.4C31 7.9 58 7.2 84 7.9' fill='none' stroke='white' stroke-width='1.5' stroke-linecap='round' opacity='.5'/></svg>") no-repeat left center/100% 100%;
+  mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 10' preserveAspectRatio='none'><path d='M2.5 7.6C22 5.4 44 4.2 66 4.9c16 .5 33 1.7 51 3.4' fill='none' stroke='white' stroke-width='3.6' stroke-linecap='round'/><path d='M7 9.4C31 7.9 58 7.2 84 7.9' fill='none' stroke='white' stroke-width='1.5' stroke-linecap='round' opacity='.5'/></svg>") no-repeat left center/100% 100%}
+
+/* 目录：一条竖向导轨 + 当前项药丸，扫读时像控制台索引 */
+.toc ol{position:relative}
+.toc ol::before{content:"";position:absolute;left:0;top:3px;bottom:3px;width:1px;background:var(--line)}
+.toc a{border-radius:0 9px 9px 0;transition:color .18s,border-color .18s,background .18s,transform .18s var(--ease)}
+.toc a:hover{transform:translateX(2px);background:color-mix(in srgb,var(--wash) 45%,transparent)}
+.toc a.on{background:color-mix(in srgb,var(--accent) 12%,transparent)}
+
+/* 核心要点：序号做成小方徽标，行悬停有反馈 */
+ol.points li::before{display:flex;align-items:center;justify-content:center;width:28px;height:28px;top:14px;
+  border-radius:9px;background:color-mix(in srgb,var(--accent) 13%,transparent);
+  border:1px solid color-mix(in srgb,var(--accent) 30%,transparent);
+  font-size:11.5px;font-weight:700;color:var(--accent-ink);opacity:1;letter-spacing:.02em}
+ol.points li{transition:background .2s var(--ease),transform .2s var(--ease)}
+ol.points li:hover{background:color-mix(in srgb,var(--wash) 48%,transparent)}
+
+/* 交互手感：按钮微抬、主题圆点轻转，别太规矩 */
+button:hover{transform:translateY(-1px)}
+.sw:hover{transform:scale(1.14) rotate(-6deg)}
+
+/* 问答卡：像握在手里的卡片，悬停会轻轻翘起 */
+.qa{transition:transform .3s var(--ease),box-shadow .3s var(--ease)}
+.qa:hover{transform:translateY(-2px) rotate(-.22deg);
+  box-shadow:0 2px 4px color-mix(in srgb,var(--ink) 6%,transparent),0 34px 62px -34px color-mix(in srgb,var(--ink) 52%,transparent)}
+
+/* 时间戳小圆片：轻微手写角度，悬停抚平 */
+.ts{transform:rotate(-.6deg)}
+.ts:hover{transform:rotate(0) translateY(-1px)}
+
+/* 术语表：英文列走等宽，像速查卡；行悬停像鼠标划过纸面 */
+table.terms td:first-child{font-family:var(--mono);font-size:13.8px;letter-spacing:-.01em}
+table.terms tbody tr:hover{background:color-mix(in srgb,var(--wash) 72%,transparent)}
+
+/* 进度条：细亮线，滚动手感更「现场」 */
+.progress{height:3px}
+.progress i{background:linear-gradient(90deg,color-mix(in srgb,var(--accent) 62%,transparent),var(--accent))}
+
+/* 页脚：生成时间做成印章，署名感更强 */
+footer{margin-top:76px}
+.stamp{display:inline-block;padding:2px 9px;border-radius:7px;transform:rotate(-.5deg);
+  border:1px dashed color-mix(in srgb,var(--accent) 45%,var(--line));
+  font-family:var(--mono);font-size:11.5px;letter-spacing:.02em;
+  color:color-mix(in srgb,var(--accent-ink) 88%,var(--ink-mute))}
+
+/* ============================================================
+   工作台骨架：顶栏 / 视图台 / 切换式内容 / 工具台
+   ============================================================ */
+.topbar{position:sticky;top:0;z-index:8;border-bottom:1px solid var(--line);
+  background:color-mix(in srgb,var(--bg) 90%,transparent);backdrop-filter:blur(12px) saturate(1.2)}
+.tb-in{max-width:1560px;margin:0 auto;padding:14px 26px 13px;display:grid;grid-template-columns:minmax(0,1fr);gap:12px}
+@media (min-width:1020px){ .tb-in{grid-template-columns:minmax(0,1fr) 400px;gap:0 34px;align-items:center} }
+.tb-id h1{font-size:clamp(21px,2.2vw,29px);line-height:1.18;letter-spacing:-.022em;margin:0;font-weight:680;max-width:34ch}
+.tb-id h1 .say{width:26px;height:26px;border-radius:8px;margin-left:10px;vertical-align:.35em}
+.tb-id h1 .say svg{width:14px;height:14px}
+.tb-lead{margin:5px 0 0;font-size:13.5px;line-height:1.55;color:var(--ink-mute);max-width:76ch}
+.tb-ctl{display:flex;flex-direction:column;gap:9px}
+.topbar .player{margin:0;max-width:none;padding:8px 12px}
+.topbar .player audio{height:34px}
+.topbar .bar{margin:0;gap:7px}
+.topbar .bar button{padding:6px 11px;font-size:12.5px}
+.topbar .themes .lbl{display:none}
+
+/* 底部状态栏：一条**不透明**的渐隐页脚。原来只有 position:sticky、连背景都没有，
+   结果是透明文字浮在正文上＝看着像压字（2026-09-29 用户报的正是这个）。
+   现在：① 不透明底 ② 吸底时上沿加 22px 渐隐（见下方 @media min-width:1020px），
+   滚过去的正文会溶进背景，不会被切成半行。 */
+.statusbar{display:flex;flex-wrap:wrap;gap:4px 20px;align-items:baseline;justify-content:space-between;
+  padding:7px 26px;border-top:1px solid var(--line);background:var(--bg);
+  color:var(--ink-mute);font-size:12px;line-height:1.5;letter-spacing:.01em}
+.statusbar .sb-l{color:var(--ink-soft);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:44ch}
+.statusbar .sb-c{color:var(--ink-mute)}
+.statusbar .sb-r{font-variant-numeric:tabular-nums;white-space:nowrap}
+
+/* 三栏：视图台 / 内容 / 工具台 */
+.wb{max-width:1560px;margin:0 auto;padding:0 26px 90px;display:grid;grid-template-columns:minmax(0,1fr);gap:0}
+@media (min-width:1020px){ .wb{grid-template-columns:230px minmax(0,1fr) 296px;gap:0 32px;align-items:start} }
+.nav,.tools{position:sticky;top:104px;align-self:start;padding-top:22px}
+.nav-hd{font-size:11px;letter-spacing:.16em;color:var(--ink-mute);margin:0 0 11px 3px}
+ol.views{list-style:none;margin:0;padding:0;counter-reset:v}
+ol.views li{margin:2px 0}
+ol.views a{display:grid;grid-template-columns:30px minmax(0,1fr) auto;align-items:center;gap:9px;
+  padding:9px 11px;border-radius:11px;font-size:14px;color:var(--ink-soft);text-decoration:none;
+  border:1px solid transparent;transition:background .18s,color .18s,border-color .18s,transform .18s var(--ease)}
+ol.views a::before{counter-increment:v;content:counter(v,decimal-leading-zero);font-family:var(--mono);
+  font-size:11px;letter-spacing:.04em;color:var(--ink-mute)}
+ol.views a:hover{background:color-mix(in srgb,var(--wash) 55%,transparent);transform:translateX(2px)}
+ol.views a.on{background:color-mix(in srgb,var(--accent) 13%,transparent);color:var(--accent-ink);font-weight:620;
+  border-color:color-mix(in srgb,var(--accent) 34%,transparent)}
+ol.views a.on::before{color:var(--accent-ink)}
+ol.views .n{font-family:var(--mono);font-size:11px;color:var(--ink-mute);font-variant-numeric:tabular-nums}
+ol.views a.on .n{color:var(--accent-ink)}
+.nav-meta{margin-top:18px;padding-top:15px;border-top:1px solid var(--line-soft)}
+.nav-meta .facts{margin:0;padding:0;border:0;display:grid;gap:6px;font-size:12px}
+.nav-meta .facts>div{padding-right:0}
+.nav-meta .facts>div:not(:last-child)::after{display:none}
+.nav-meta .facts b{display:inline-block;min-width:0;color:var(--ink-mute);font-weight:400;margin:0}
+.nav-meta .facts>div{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+.nav-meta .facts span{color:var(--ink-soft);font-variant-numeric:tabular-nums;text-align:right}
+
+/* 内容区：一次只显示一个视图（窄屏则全部展开） */
+.stage{min-width:0;padding-top:22px}
+.stage>section{display:none;margin-top:0;padding-top:4px;border-top:0}
+.stage>section.on{display:block}
+@media (max-width:1019px){ .stage>section{display:block!important} }
+.stage>section>h2.sec{margin-top:2px}
+
+/* 工具台 */
+.tools{display:grid;gap:14px}
+.tool{border:1px solid var(--line);border-radius:14px;background:var(--surface);padding:13px 14px}
+.tool h3{margin:0 0 10px;font-size:11.5px;letter-spacing:.1em;color:var(--ink-mute);font-weight:620}
+.tool .hint{font-weight:400;letter-spacing:0;opacity:.75}
+ol.recap{list-style:none;margin:0;padding:0;max-height:306px;overflow-y:auto;overscroll-behavior:contain}
+ol.recap li{border-bottom:1px solid var(--line-soft)}
+ol.recap li:last-child{border-bottom:0}
+ol.recap button{display:block;width:100%;text-align:left;background:none;border:0;padding:7px 0;cursor:pointer;
+  font:inherit;font-size:12.5px;line-height:1.5;color:var(--ink-soft)}
+ol.recap button:hover{color:var(--accent-ink)}
+ol.recap .t{font-family:var(--mono);font-size:11px;color:var(--accent-ink);margin-right:8px}
+.recap-empty{font-size:12.5px;color:var(--ink-mute)}
+#findTerms{width:100%;box-sizing:border-box;font:inherit;font-size:13px;padding:8px 10px;border-radius:9px;
+  border:1px solid var(--line);background:var(--bg);color:var(--ink)}
+#findTerms:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.find-res{margin-top:9px;display:grid;gap:7px;max-height:300px;overflow-y:auto;overscroll-behavior:contain}
+.find-res .r{font-size:12.5px;line-height:1.55;color:var(--ink-soft);padding-bottom:7px;border-bottom:1px solid var(--line-soft)}
+.find-res .r b{color:var(--ink);font-family:var(--mono);font-size:12px}
+.find-res .r i{color:var(--ink-mute);font-style:normal}
+.stats{display:grid;grid-template-columns:auto 1fr;gap:6px 12px;font-size:12.5px;color:var(--ink-mute)}
+.stats b{color:var(--ink);font-variant-numeric:tabular-nums;font-weight:600}
+
+/* 顶栏与工具台在打印时让位 */
+@media print{ .stage>section{display:block!important} }
+
+/* （原有的「固定视口外壳」已删除：它会把内容裁掉且滑不动，改用下面的文档流方案） */
+/* ===== 布局：文档正常滚动 + 顶栏/侧栏粘性（页面永远可滚，内容永不被裁）===== */
+@media (min-width:1020px){
+  html,body{height:auto;overflow:visible;display:block}
+  body{display:block}
+  .wb{display:grid;grid-template-columns:236px minmax(0,1fr) 300px;gap:0 32px;align-items:start;
+    max-width:1560px;padding:0 26px 60px;overflow:visible;min-height:0}
+  .nav,.tools{position:sticky;top:92px;align-self:start;max-height:calc(100vh - 120px);overflow-y:auto;
+    overscroll-behavior:contain;padding:18px 4px 22px;background:transparent;border:0}
+  .stage{overflow:visible;min-height:0;padding:8px 0 40px}
+  .stage-head{position:sticky;top:74px;z-index:6;margin:0 0 16px;padding:9px 0;
+    border-bottom:1px solid var(--line-soft);background:color-mix(in srgb,var(--bg) 93%,transparent);backdrop-filter:blur(10px)}
+  /* 吸底时：不透明 + 上沿 22px 渐隐，滚过去的正文「溶进」背景，而不是被切成半行 */
+  .statusbar{position:sticky;bottom:0;z-index:7;margin:26px auto 0;max-width:1560px;
+    background:var(--bg);border-top:0}
+  .statusbar::before{content:"";position:absolute;left:0;right:0;bottom:100%;height:22px;pointer-events:none;
+    background:linear-gradient(to top,var(--bg),transparent)}
+  .topbar{padding-bottom:8px}
+  .tb-in{padding:11px 26px 10px}
+  .tb-id h1{font-size:clamp(19px,1.9vw,25px)}
+  .tb-lead{margin:3px 0 0;font-size:12.5px;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
+}
+
+/* 同门课其它讲次 */
+.sibs-hd{margin:20px 0 8px;font-size:11px;letter-spacing:.16em;color:var(--ink-mute)}
+ol.sibs{list-style:none;margin:0;padding:0}
+ol.sibs li{margin:1px 0}
+ol.sibs a{display:grid;grid-template-columns:64px minmax(0,1fr);gap:8px;align-items:baseline;padding:7px 10px;
+  border-radius:9px;text-decoration:none;color:var(--ink-soft);font-size:12.5px;line-height:1.45;
+  border:1px solid transparent;transition:background .18s,color .18s,transform .18s var(--ease)}
+ol.sibs a:hover{background:color-mix(in srgb,var(--wash) 55%,transparent);color:var(--accent-ink);transform:translateX(2px)}
+ol.sibs .d{font-family:var(--mono);font-size:11px;color:var(--ink-mute)}
+
+/* 窄屏回退：视图台横排成胶囊行，工具台铺在内容下方，避免拉成全宽大行 */
+@media (max-width:1019px){
+  .wb{padding:0 18px 60px}
+  .nav{padding:16px 0 6px}
+  ol.views{display:flex;flex-wrap:wrap;gap:6px}
+  ol.views a{grid-template-columns:auto auto auto;gap:6px;padding:6px 11px;font-size:13px;border-radius:999px;
+    background:color-mix(in srgb,var(--surface) 70%,var(--bg));border:1px solid var(--line)}
+  ol.views a::before{font-size:10px}
+  ol.views .n{font-size:10px;opacity:.8}
+  ol.views a.on{background:color-mix(in srgb,var(--accent) 14%,transparent)}
+  .nav-meta{display:none}
+  .nav-hd{margin-bottom:8px}
+  .stage{padding-top:14px}
+  .tools{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;padding:18px 0 0}
+  .statusbar{position:static;margin-top:22px;flex-wrap:wrap;gap:6px 12px}
+  .statusbar .sb-c{display:none}
+}
+</style>
+</head>
+<body data-theme="paper">
+<a class="skip" href="#start">跳到正文</a>
+<div class="progress" aria-hidden="true"><i id="pg"></i></div>
+
+<header class="topbar">
+  <div class="tb-in">
+    <div class="tb-id">
+    <h1><!--TITLE--><button class="say" type="button" data-say="<!--TITLE-->" aria-label="朗读标题" title="朗读标题"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M16 9a4 4 0 0 1 0 6"/><path d="M19 6.5a8 8 0 0 1 0 11"/></svg></button></h1>
+    <p class="tb-lead"><!--ONELINE--></p>
+    </div>
+    <div class="tb-ctl">
+      <!--PLAYER-->
+      <div class="bar">
+      <button id="btnPrint" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M7 8V3h10v5"/><rect x="4" y="8" width="16" height="8" rx="2"/><path d="M7 14h10v7H7z"/></svg>打印 / PDF</button>
+      <span class="spacer"></span>
+      <div class="themes" role="group" aria-label="主题">
+        <span class="lbl">主题</span>
+        <button class="sw" type="button" data-theme="paper"  title="纸墨" aria-label="纸墨主题"><i style="background:#a63d2f"></i></button>
+        <button class="sw" type="button" data-theme="forest" title="松林" aria-label="松林主题"><i style="background:#2a6345"></i></button>
+        <button class="sw" type="button" data-theme="cobalt" title="深海" aria-label="深海主题"><i style="background:#1f4bb8"></i></button>
+        <button class="sw" type="button" data-theme="dusk"   title="夜航" aria-label="夜航主题"><i style="background:#e6ab63"></i></button>
+        <button class="sw" type="button" data-theme="jade"   title="墨玉" aria-label="墨玉主题"><i style="background:#63d9b0"></i></button>
+        <button class="sw" type="button" data-theme="aurora" title="紫夜" aria-label="紫夜主题"><i style="background:#ad92ff"></i></button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="wb" id="start">
+  <aside class="nav toc" id="nav" aria-label="本课视图">
+    <div class="nav-hd">本课视图</div>
+    <ol class="views"><!--TOC--></ol>
+    <!--SIBLINGS-->
+    <div class="nav-meta"><!--FACTS--></div>
+  </aside>
+
+  <div class="stage" id="stage">
+      <section id="points" class="reveal">
+        <h2 class="sec">核心要点</h2>
+        <!--KEYPOINTS-->
+      </section>
+
+      <section id="notes" class="reveal">
+        <h2 class="sec">结构化笔记</h2>
+        <div class="prose"><!--NOTES--></div>
+      </section>
+
+      <section id="bilingual" class="reveal">
+        <h2 class="sec">中英对照<button class="say" type="button" data-readall="#bilingual" data-say="Read all the classroom quotes in the bilingual section." aria-label="连读本节全部英文原句" title="连读本节英文（再点一次停止）"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M16 9a4 4 0 0 1 0 6"/><path d="M19 6.5a8 8 0 0 1 0 11"/><path d="M21.5 4a11 11 0 0 1 0 16"/></svg></button></h2>
+        <div class="bi"><!--BILINGUAL--></div>
+      </section>
+
+      <section id="terms" class="reveal">
+        <h2 class="sec">术语表<button class="say" type="button" data-readall="#terms" data-say="Read all the glossary terms in the terminology section." aria-label="连读本节全部术语" title="连读本节术语（再点一次停止）"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M16 9a4 4 0 0 1 0 6"/><path d="M19 6.5a8 8 0 0 1 0 11"/><path d="M21.5 4a11 11 0 0 1 0 16"/></svg></button></h2>
+        <!--TERMS-->
+      </section>
+
+      <section id="mindmap" class="reveal">
+        <h2 class="sec">思维导图</h2>
+        <p style="font-size:13px;color:var(--ink-mute);margin:-8px 0 16px">点方框可展开／收起；也可整块复制后粘进 XMind。</p>
+        <!--MINDMAP-->
+      </section>
+
+      <section id="qa" class="reveal">
+        <h2 class="sec">复习问答</h2>
+        <div class="qa" id="qa">
+          <p class="q" id="qaQ">—</p>
+          <p class="a" id="qaA"></p>
+          <div class="ctrl">
+            <button id="qaPrev" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>上一题</button>
+            <button id="qaShow" type="button">显示答案 <span class="kbd">空格</span></button>
+            <button id="qaNext" type="button">下一题<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>
+            <span class="count" id="qaCount">0 / 0</span>
+          </div>
+        </div>
+      </section>
+
+      <section id="todos" class="reveal">
+        <h2 class="sec">待办</h2>
+        <!--TODOS-->
+      </section>
+
+      <section id="handout" class="reveal">
+        <h2 class="sec">课件核对</h2>
+        <!--HANDOUT-->
+      </section>
+
+    <footer>
+    本地生成：whisper.cpp 转写 + DeepSeek 加工 · <span class="stamp"><!--GENAT--></span><br>
+    转写稿中识别存疑处标有「存疑」；重要数字、公式与截止日期请回看课件核对。
+    <span class="noprint">勾选状态与主题选择保存在本机浏览器。</span>
+    </footer>
+  </div><!-- /.stage -->
+
+  <aside class="tools" id="tools" aria-label="学习工具">
+    <section class="tool">
+      <h3>术语快查</h3>
+      <input id="findTerms" type="search" placeholder="输入英文或中文…" autocomplete="off">
+      <div class="find-res" id="findRes"></div>
+    </section>
+  </aside>
+</div><!-- /.wb -->
+
+<script type="application/json" id="raw"><!--RAWJSON--></script>
+<script>
+(function(){
+  var raw = JSON.parse(document.getElementById('raw').textContent);
+  var KEY = 'lecture-notes:' + (raw.title || 'untitled');
+  var THEMES = ['paper','forest','cobalt','dusk','jade','aurora'];
+
+  /* 主题：首次跟随系统，之后记住你的选择 */
+  var savedTheme = null;
+  try { savedTheme = localStorage.getItem(KEY + ':theme'); } catch (e) { savedTheme = null; }
+  function sysTheme(){
+    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dusk' : 'paper';
+  }
+  function applyTheme(t){
+    if (THEMES.indexOf(t) < 0) t = sysTheme();
+    document.body.setAttribute('data-theme', t);
+    Array.prototype.forEach.call(document.querySelectorAll('.sw'), function(b){
+      b.setAttribute('aria-pressed', b.getAttribute('data-theme') === t ? 'true' : 'false');
+    });
+  }
+  applyTheme(savedTheme || sysTheme());
+  Array.prototype.forEach.call(document.querySelectorAll('.sw'), function(b){
+    b.onclick = function(){
+      var t = b.getAttribute('data-theme');
+      try { localStorage.setItem(KEY + ':theme', t); } catch (e) { /* 隐私模式忽略 */ }
+      applyTheme(t);
+    };
+  });
+
+  /* 阅读进度 */
+  var pg = document.getElementById('pg');
+  function onScroll(){
+    var h = document.documentElement, max = h.scrollHeight - h.clientHeight;
+    pg.style.width = (max > 0 ? (h.scrollTop / max) * 100 : 0) + '%';
+  }
+  document.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  /* 目录高亮 + 入场（同一批进入视口的错开一点点，不是逐节同一个动画） */
+  var links = Array.prototype.slice.call(document.querySelectorAll('.toc a'));
+  var secs = links.map(function(a){ return document.querySelector(a.getAttribute('href')); });
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if (!en.isIntersecting) return;
+        var i = secs.indexOf(en.target);
+        links.forEach(function(l, k){ l.classList.toggle('on', k === i); });
+      });
+    }, { rootMargin: '-12% 0px -72% 0px' });
+    secs.forEach(function(s){ if (s) io.observe(s); });
+
+    var re = new IntersectionObserver(function(entries){
+      var k = 0;
+      entries.forEach(function(en){
+        if (!en.isIntersecting) return;
+        en.target.style.setProperty('--i', String(k++));
+        en.target.classList.add('in');
+        re.unobserve(en.target);
+      });
+    }, { rootMargin: '-6% 0px -12% 0px' });
+    Array.prototype.forEach.call(document.querySelectorAll('.reveal'), function(el){ re.observe(el); });
+  } else {
+    Array.prototype.forEach.call(document.querySelectorAll('.reveal'), function(el){ el.classList.add('in'); });
+  }
+
+  /* 思维导图折叠 */
+  Array.prototype.forEach.call(document.querySelectorAll('ul.tree li'), function(li){
+    var sub = li.querySelector(':scope > ul');
+    if (!sub) return;
+    var row = li.querySelector(':scope > .row');
+    if (!row) return;
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'tog';
+    btn.setAttribute('aria-expanded', 'true');
+    btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>';
+    var mark = row.querySelector('.leafmark');
+    if (mark) mark.remove();
+    btn.onclick = function(e){
+      e.preventDefault();
+      var open = li.classList.toggle('open');
+      btn.setAttribute('aria-expanded', String(open));
+    };
+    row.insertBefore(btn, row.firstChild);
+    li.classList.add('open');
+  });
+
+  /* 问答卡 */
+  var qa = raw.qa || [], qi = 0, revealed = false;
+  var elQ = document.getElementById('qaQ'), elA = document.getElementById('qaA'),
+      elC = document.getElementById('qaCount'), elCard = document.getElementById('qa'),
+      elShow = document.getElementById('qaShow');
+  function drawQa(){
+    if (!qa.length) { elQ.textContent = '（本次笔记没有生成问答）'; elC.textContent = '0 / 0'; elShow.disabled = true; return; }
+    elQ.textContent = qa[qi].q || '';
+    elA.textContent = revealed ? (qa[qi].a || '') : '';
+    elCard.classList.toggle('revealed', revealed);
+    elShow.textContent = revealed ? '隐藏答案' : '显示答案';
+    elC.textContent = (qi + 1) + ' / ' + qa.length;
+  }
+  elShow.onclick = function(){ revealed = !revealed; drawQa(); };
+  elCard.onclick = function(e){ if (e.target.closest('.ctrl')) return; revealed = !revealed; drawQa(); };
+  document.getElementById('qaNext').onclick = function(){ if (!qa.length) return; qi = (qi + 1) % qa.length; revealed = false; drawQa(); };
+  document.getElementById('qaPrev').onclick = function(){ if (!qa.length) return; qi = (qi - 1 + qa.length) % qa.length; revealed = false; drawQa(); };
+  document.addEventListener('keydown', function(e){
+    if (/^(INPUT|TEXTAREA|SELECT)$/.test((e.target.tagName || ''))) return;
+    if (e.key === ' ' || e.key === 'Spacebar') { e.preventDefault(); revealed = !revealed; drawQa(); }
+    if (e.key === 'ArrowRight') { document.getElementById('qaNext').click(); }
+    if (e.key === 'ArrowLeft') { document.getElementById('qaPrev').click(); }
+  });
+  drawQa();
+
+  /* 待办持久化 + 进度 */
+  var boxes = Array.prototype.slice.call(document.querySelectorAll('ul.todos input[type=checkbox]'));
+  function todoState(){
+    var done = boxes.filter(function(b){ return b.checked; }).length;
+    var pill = document.getElementById('todoBar');
+    if (pill) pill.textContent = done + ' / ' + boxes.length + ' 已完成';
+  }
+  boxes.forEach(function(box, i){
+    var k = KEY + ':todo:' + i;
+    try { if (localStorage.getItem(k) === '1') { box.checked = true; box.closest('li').classList.add('done'); } } catch (e) { /* 忽略 */ }
+    box.onchange = function(){
+      try { localStorage.setItem(k, box.checked ? '1' : '0'); } catch (e) { /* 忽略 */ }
+      box.closest('li').classList.toggle('done', box.checked);
+      todoState();
+    };
+  });
+  if (boxes.length) todoState();
+
+  /* 朗读：点英文句子/术语旁的按钮即可听（英式发音优先，可再点一次停止） */
+  var voiceList = [];
+  function loadVoices(){ try { voiceList = window.speechSynthesis.getVoices() || []; } catch(e){ voiceList = []; } }
+  if ('speechSynthesis' in window) { loadVoices(); window.speechSynthesis.onvoiceschanged = loadVoices; }
+  function pickEnVoice(){
+    var pref = ['en-GB','en-AU','en-NZ','en-US','en'];
+    for (var i = 0; i < pref.length; i++) {
+      for (var j = 0; j < voiceList.length; j++) {
+        var lang = String(voiceList[j].lang || '').replace('_','-');
+        if (lang.indexOf(pref[i]) === 0) return voiceList[j];
+      }
+    }
+    return null;
+  }
+  var sayBtn = null, readBusy = null;
+  document.addEventListener('click', function(e){
+    var btn = e.target && e.target.closest ? e.target.closest('[data-say]') : null;
+    if (!btn) return;
+    if (btn.hasAttribute('data-readall')) return;  /* “连读本节”由它自己的逻辑处理，这里不插手 */
+    if (readBusy && readBusy.__stop) readBusy.__stop();  /* 连读中点单句 → 先停连读 */
+    e.preventDefault();
+    if (!('speechSynthesis' in window)) { flash('这个浏览器不支持朗读'); return; }
+    if (btn === sayBtn && window.speechSynthesis.speaking) {
+      window.speechSynthesis.cancel(); btn.classList.remove('on'); sayBtn = null; return;
+    }
+    window.speechSynthesis.cancel();
+    if (sayBtn) sayBtn.classList.remove('on');
+    var u = new SpeechSynthesisUtterance(String(btn.getAttribute('data-say') || ''));
+    var v = pickEnVoice(); if (v) u.voice = v;
+    u.lang = (v && v.lang) || 'en-GB';
+    u.rate = parseFloat(localStorage.getItem('notes-rate') || '0.9');
+    u.onend = function(){ btn.classList.remove('on'); if (sayBtn === btn) sayBtn = null; };
+    btn.classList.add('on'); sayBtn = btn;
+    window.speechSynthesis.speak(u);
+  });
+
+  /* 连读本节英文：把一个区域里的英文原句依次读完（点任意处或再点一次即停） */
+  Array.prototype.forEach.call(document.querySelectorAll('[data-readall]'), function(btn){
+    var queue = [], idx = -1, playing = false, cur = null, gen = 0;
+    function clearMarks(){ if (cur) { cur.classList.remove('on'); cur = null; } }
+    function stop(){
+      playing = false; idx = -1; gen++;
+      if (readBusy === btn) readBusy = null;
+      clearMarks(); btn.classList.remove('on');
+      if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+    }
+    btn.__stop = stop;
+    function next(){
+      if (!playing || idx >= queue.length) { stop(); return; }
+      var g = gen, el = queue[idx++];
+      cur = el; el.classList.add('on');
+      var u = new SpeechSynthesisUtterance(String(el.getAttribute('data-say') || ''));
+      var v = pickEnVoice(); if (v) u.voice = v;
+      u.lang = (v && v.lang) || 'en-GB';
+      u.rate = parseFloat(localStorage.getItem('notes-rate') || '0.9');
+      u.onend = function(){ if (g !== gen) return; el.classList.remove('on'); if (cur === el) cur = null; next(); };
+      u.onerror = u.onend;
+      window.speechSynthesis.speak(u);
+    }
+    btn.onclick = function(e){
+      e.preventDefault(); e.stopPropagation();
+      if (!('speechSynthesis' in window)) { flash('这个浏览器不支持朗读'); return; }
+      if (playing) { stop(); return; }
+      queue = Array.prototype.slice.call(document.querySelectorAll(btn.getAttribute('data-readall') + ' [data-say]'));
+      if (!queue.length) { flash('本节还没有可朗读的英文'); return; }
+      window.speechSynthesis.cancel();
+      playing = true; idx = 0; gen++; readBusy = btn; btn.classList.add('on');
+      next();
+    };
+  });
+
+  /* 时间戳跳转：点 [12:34] 把内嵌录音跳到该位置 */
+  var lecPlayer = document.getElementById('lecAudio');
+  document.addEventListener('click', function(e){
+    var el = e.target && e.target.closest ? e.target.closest('[data-t]') : null;
+    if (!el || !lecPlayer) return;
+    e.preventDefault();
+    var sec = parseFloat(el.getAttribute('data-t')) || 0;
+    try { lecPlayer.currentTime = Math.max(0, sec - 1); lecPlayer.play(); } catch(err) {}
+  });
+  /* 导出 */
+  function buildMd(){
+    var L = [], t = raw.title || '课堂笔记';
+    L.push('# ' + t);
+    if (raw.course) L.push('课程：' + raw.course);
+    if (raw.oneLine) L.push('', '> ' + raw.oneLine);
+    if ((raw.keyPoints || []).length) { L.push('', '## 核心要点'); raw.keyPoints.forEach(function(k){ L.push('- ' + k); }); }
+    if (raw.notes) L.push('', '## 笔记', raw.notes);
+    if ((raw.bilingual || []).length) { L.push('', '## 中英对照'); raw.bilingual.forEach(function(b, n){ L.push('**' + (n + 1) + '.** ' + b.en, '> ' + b.zh); }); }
+    if ((raw.terms || []).length) { L.push('', '## 术语表', '| 英文 | 中文 | 说明 |', '| --- | --- | --- |'); raw.terms.forEach(function(x){ L.push('| ' + x.en + ' | ' + x.zh + ' | ' + x.note + ' |'); }); }
+    if (raw.mindmap) L.push('', '## 思维导图', raw.mindmap);
+    if ((raw.qa || []).length) { L.push('', '## 复习问答'); raw.qa.forEach(function(x, n){ L.push((n + 1) + '. **' + x.q + '**', '   ' + x.a); }); }
+    if ((raw.todos || []).length) { L.push('', '## 待办'); raw.todos.forEach(function(x){ L.push('- [ ] ' + x); }); }
+    return L.join('\n');
+  }
+  /* 顶栏工具：复制 Markdown / 导出 JSON 已按用户要求撤掉（同目录本来就有 .md/.json 文件，按钮是重复入口）。
+     取元素一律判空——删了按钮还照旧写 onclick 会在控制台抛错，并中断后面所有脚本。 */
+  var _btnMd = document.getElementById('btnMd');
+  if (_btnMd) _btnMd.onclick = function(){
+    var txt = buildMd();
+    function ok(){ flash('Markdown 已复制'); }
+    function fallback(t){
+      var ta = document.createElement('textarea');
+      ta.value = t; document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); ok(); } catch (e) { alert('复制失败，请手动选择正文'); }
+      ta.remove();
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(txt).then(ok, function(){ fallback(txt); });
+    } else { fallback(txt); }
+  };
+  var _btnJson = document.getElementById('btnJson');
+  if (_btnJson) _btnJson.onclick = function(){
+    var blob = new Blob([JSON.stringify(raw, null, 2)], { type: 'application/json' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = (raw.title || 'notes') + '.json';
+    a.click();
+    setTimeout(function(){ URL.revokeObjectURL(a.href); }, 4000);
+  };
+  var _btnPrint = document.getElementById('btnPrint');
+  if (_btnPrint) _btnPrint.onclick = function(){ window.print(); };
+
+  function flash(msg){
+    var d = document.createElement('div');
+    d.textContent = msg;
+    d.style.cssText = 'position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:var(--ink);' +
+      'color:var(--bg);padding:9px 16px;border-radius:999px;font-size:13px;z-index:30;opacity:0;transition:opacity .2s';
+    document.body.appendChild(d);
+    requestAnimationFrame(function(){ d.style.opacity = '1'; });
+    setTimeout(function(){ d.style.opacity = '0'; setTimeout(function(){ d.remove(); }, 250); }, 1600);
+  }
+})();
+</script>
+
+<div class="statusbar" id="statusbar" aria-hidden="true">
+  <span class="sb-l" id="sbLeft">—</span>
+  <span class="sb-c">空格显示答案 · ←→ 翻题 · 点 [mm:ss] 回听 · 点左栏切换视图</span>
+  <span class="sb-r" id="sbRight">—</span>
+</div>
+
+<script>
+/* ---------- 工作台：视图切换 / 回听索引 / 术语快查 / 统计 ---------- */
+(function(){
+  var body=document.body, stage=document.getElementById('stage');
+  var links=[].slice.call(document.querySelectorAll('ol.views a'));
+  var ids=links.map(function(a){return (a.getAttribute('href')||'').replace('#','');}).filter(Boolean);
+  if(!stage||!ids.length) return;
+  /* 左栏条目数徽标：数 DOM 元素。
+     ⚠ 两处修正（2026-09-29）：
+       ① 问答是「单卡轮播」（只有一个 .qa，内部翻页），DOM 里数不出条数 —— 原来一直显示 0，
+          看着像"这一节是空的"。改成从内嵌 JSON 取 qa.length。
+       ② 表格的**表头行**不算一条（术语表原来把表头也数进去了，29 个词显示 30）。 */
+  var _rawD=null;
+  function pageData(){
+    if(_rawD!==null) return _rawD;
+    try{ _rawD=JSON.parse(document.getElementById('raw').textContent)||{}; }catch(e){ _rawD={}; }
+    return _rawD;
+  }
+  function count(s){
+    if(!s) return 0;
+    if(s.id==='qa'){ var d=pageData(); return (d&&d.qa)?d.qa.length:0; }
+    var n=s.querySelectorAll('li,tr,.pair').length;
+    if(s.querySelector('thead')) n-=1;
+    return n;
+  }
+  function show(id, scroll){
+    if(ids.indexOf(id)<0) id=ids[0];
+    body.setAttribute('data-view', id);
+    [].forEach.call(stage.querySelectorAll('section'), function(s){
+      var on=(s.id===id); s.classList.toggle('on', on);
+      if(on) s.classList.add('in');            // 切过来时补上入场类，避免停在 opacity:0
+      if(on) [].forEach.call(s.querySelectorAll('.reveal'), function(e){ e.classList.add('in'); });
+    });
+    links.forEach(function(a){
+      var hit=(a.getAttribute('href')||'')==='#'+id;
+      a.classList.toggle('on', hit);
+      if(hit) a.setAttribute('aria-current','true'); else a.removeAttribute('aria-current');
+    });
+    if(scroll!==false){ var y=stage.getBoundingClientRect().top+window.scrollY-90; window.scrollTo({top:y,behavior:'smooth'}); }
+    try{ history.replaceState(null,'','#'+id); }catch(e){
+      try{ location.hash=id; }catch(e2){}
+    }
+  }
+  links.forEach(function(a){
+    a.addEventListener('click', function(e){ e.preventDefault(); show((a.getAttribute('href')||'').replace('#','')); });
+    // 条目数徽标
+    var id=(a.getAttribute('href')||'').replace('#',''), s=document.getElementById(id);
+    if(s){ var sp=document.createElement('span'); sp.className='n'; sp.textContent=count(s);
+      var hd=s.querySelector('h2.sec'); if(hd) a.setAttribute('title', hd.textContent);
+      a.appendChild(sp); }
+  });
+  // 回听索引：从正文里的 [mm:ss] 小圆片抽一条一条的原话
+  var recap=document.getElementById('recap'), seen={};
+  if(recap){
+    [].forEach.call(document.querySelectorAll('[data-t]'), function(el){
+      var t=el.getAttribute('data-t'); if(!t||seen[t]) return; seen[t]=1;
+      var box=el.closest('li,.pair,.kp')||el.parentNode;
+      var txt=(box?box.textContent:'').replace(el.textContent,'').replace(/\s+/g,' ').trim().slice(0,70);
+      var li=document.createElement('li'), b=document.createElement('button');
+      b.type='button'; b.innerHTML='<span class="t">'+el.textContent.trim()+'</span>'+txt;
+      b.onclick=function(){
+        var au=document.getElementById('lecAudio');
+        if(au){ au.currentTime=parseFloat(t)||0; try{ au.play(); }catch(e){} }
+        show('bilingual', false);
+      };
+      li.appendChild(b); recap.appendChild(li);
+    });
+    if(!recap.children.length){ recap.innerHTML='<li class="recap-empty">这段笔记没有时间戳（录音稿未生成 SRT 时会这样）</li>'; }
+  }
+  // 术语快查：输入即过滤（英文/中文/解释都匹配）
+  var inp=document.getElementById('findTerms'), res=document.getElementById('findRes');
+  var rows=[];
+  [].forEach.call(document.querySelectorAll('table.terms tbody tr'), function(tr){
+    var td=tr.querySelectorAll('td');
+    if(td.length>=2) rows.push({en:(td[0].textContent||'').trim(), zh:(td[1].textContent||'').trim(), note:td[2]?(td[2].textContent||'').trim():''});
+  });
+  function paint(q){
+    if(!res) return; res.innerHTML='';
+    q=(q||'').trim().toLowerCase();
+    if(!q){ res.innerHTML='<div class="recap-empty">共 '+rows.length+' 个术语，输入关键词即时筛选</div>'; return; }
+    var hit=rows.filter(function(r){ return (r.en+' '+r.zh+' '+r.note).toLowerCase().indexOf(q)>=0; }).slice(0,40);
+    if(!hit.length){ res.innerHTML='<div class="recap-empty">没找到匹配的术语</div>'; return; }
+    hit.forEach(function(r){ var d=document.createElement('div'); d.className='r';
+      d.innerHTML='<b>'+r.en.replace(/</g,'&lt;')+'</b> '+(r.zh?('· '+r.zh.replace(/</g,'&lt;')):'')+(r.note?(' <i>'+r.note.replace(/</g,'&lt;').slice(0,60)+'</i>'):'');
+      res.appendChild(d); });
+  }
+  if(inp){ inp.addEventListener('input', function(){ paint(inp.value); }); paint(''); }
+  // 本课统计
+  var st=document.getElementById('stats');
+  if(st){
+    var raw={}; try{ raw=JSON.parse(document.getElementById('raw').textContent||'{}'); }catch(e){}
+    var facts=[];
+    facts.push(['要点', (raw.keyPoints||[]).length]);
+    facts.push(['术语', (raw.terms||[]).length]);
+    facts.push(['问答', (raw.qa||[]).length]);
+    facts.push(['对照', (raw.bilingual||[]).length]);
+    facts.push(['待办', (raw.todos||[]).length]);
+    facts.push(['时间点', document.querySelectorAll('[data-t]').length]);
+    st.innerHTML=facts.map(function(f){ return '<span>'+f[0]+'</span><b>'+f[1]+'</b>'; }).join('');
+  }
+  // 面包屑 + 状态栏
+  var head=document.getElementById('stageHead');
+  var sbL=document.getElementById('sbLeft'), sbR=document.getElementById('sbRight');
+  function chrome(){
+    var cur=ids.filter(function(i){ return document.getElementById(i) && document.getElementById(i).classList.contains('on'); })[0]||ids[0];
+    var s=document.getElementById(cur), hd=s?s.querySelector('h2.sec'):null;
+    var nm=hd?hd.textContent.replace(/\s+/g,' ').trim():cur;
+    var c=count(s);
+    if(head){ head.innerHTML='<span class="crumb">本课</span> <span>›</span> <b>'+nm+'</b>'
+      +'<span class="spacer"></span><span class="chip">'+c+' 项</span>'
+      +'<span class="chip">'+(ids.indexOf(cur)+1)+' / '+ids.length+'</span>'; }
+    var raw={}; try{ raw=JSON.parse(document.getElementById('raw').textContent||'{}'); }catch(e){}
+    if(sbL){ sbL.textContent=(raw.course||'课堂笔记')+' · '+(raw.date||'') ; }
+    if(sbR){ sbR.textContent='要点 '+((raw.keyPoints||[]).length)+' · 术语 '+((raw.terms||[]).length)
+      +' · 问答 '+((raw.qa||[]).length)+' · 时间点 '+document.querySelectorAll('[data-t]').length; }
+  }
+
+  // 初始视图：优先 URL 里的 #（可分享到某一节）
+  show((location.hash||'').replace('#','')||ids[0], false);
+  window.addEventListener('hashchange', function(){ show((location.hash||'').replace('#',''), false); });
+  var _show=show; show=function(id,sc){ _show(id,sc); chrome(); }; chrome();
+})();
+</script>
+</body>
+</html>
